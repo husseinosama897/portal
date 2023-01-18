@@ -25,6 +25,7 @@ use App\Exceptions\CustomException;
 use App\inv_purchase;
 use App\store_history;
 use App\Events\NotificationEvent;
+use App\project_overall;
 class managerpurchaseController extends Controller
 {
 
@@ -273,18 +274,58 @@ $q->where('ref', 'LIKE', '%' . $request->ref . '%');
      ]);
 
 
- 
+ // ----------------------------  project budget -------------------------------------------------
 
     $Purchase_order->project->increment('po_expenses',$Purchase_order->total);
+//------------------------------------------------------------------------------------
+    
 
-    $report =   report::where('date',$Purchase_order->date)->increment('total_cash_out',$Purchase_order->total);
+//----------------------------------- general report -----------------------------------------------
+$report =   report::where('date',$Purchase_order->date)->increment('total_cash_out',$Purchase_order->total);
 
     if(empty($report)){
      report::create([
        'date'=>$Purchase_order->date,
        'total_cash_out'=>$Purchase_order->total,
      ]);
+
+
     }  
+//--------------------------------------------------------------------------------------------------
+
+
+    //----------------------------- project report -------------------------------------------------
+
+    
+$project_overall = project_overall::where(['date'=>Carbon::now()->startOfMonth(),'project_id'=>$Purchase_order->project_id])->first();
+
+  if($project_overall){
+
+          $project_overall->increment('cash_out',$Purchase_order->total);
+    
+  }else{
+ 
+        project_overall::create([
+            'date'=>Carbon::now()->startOfMonth(),
+            'percentage_performance'=>0,
+            'cash_out'=>$Purchase_order->total,
+            'percentage_attendance'=>0,
+            'cash_in'=>0,
+            'num_of_performers'=>0,
+            'num_of_attendance'=>0,
+            'performance_point'=>0,
+            'time_attendance'=>0,
+         
+            'project_id'=>$Purchase_order->project_id
+        ]);
+    
+    
+    
+
+  
+  
+  }
+  
 
 
 /*

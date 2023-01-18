@@ -83,53 +83,98 @@ $User = $User->withCount(['Attending_and_leaving as Absence'=> function ($query)
 
     $data = $data->with(['contract'=>function($q){
 return $q->with('project');
-    }])->with('role')
+    }])->with('role');
     
-  
-    ->withSum(
-      ['Attending_and_leaving' => function($q) use($request){
+  if($request->project_id){
+    $data=  $data->withSum(
+      ['timesheet_project_personal' => function($q) use($request){
+
+
+        if($request->project_id){
+          $q->where('project_id',$request->project_id);
+        }
+
 
         if($request->from){
 
-          $q->whereDate('attending_time','>=',$request->from);
+          $q->where('month','>=',date('m', strtotime($request->from)));
            }
+
+           if($request->from){
+            $q->where('year','>=',date('y', strtotime($request->from)));
+             }
    
+
+             if($request->to){
+   
+              $q->where('month','<=',date('m', strtotime($request->to)));
+               }
+
+
            if($request->to){
    
-              $q->whereDate('attending_time','<=',$request->to);
+              $q->where('year','<=',date('y', strtotime($request->to)));
                }
    
             return $q;   
             
 
     }],
-    'time_difference'
+    'time'
   )
 
-  ->withSum(
-    ['Attending_and_leaving' => function($q) use($request){
-
-      if($request->from){
-
-        $q->whereDate('attending_time','>=',$request->from);
-         }
- 
-         if($request->to){
- 
-            $q->whereDate('attending_time','<=',$request->to);
-             }
- 
-          return $q;   
-          
-
-  }],
-  'min'
-)
 ;
-    $data = $data->withCount(['Attending_and_leaving as Absence'=> function ($query) {
+
+  }else{
+   $data=  $data->withSum(
+      ['timesheet_monthly_personal' => function($q) use($request){
+
+
+        if($request->project_id){
+          $q->where('project_id',$request->project_id);
+        }
+
+
+        if($request->from){
+
+          $q->where('month','>=',date('m', strtotime($request->from)));
+           }
+
+           if($request->from){
+            $q->where('year','>=',date('y', strtotime($request->from)));
+             }
+   
+
+             if($request->to){
+   
+              $q->where('month','<=',date('m', strtotime($request->to)));
+               }
+
+
+           if($request->to){
+   
+              $q->where('year','<=',date('y', strtotime($request->to)));
+               }
+   
+            return $q;   
+            
+
+    }],
+    'time'
+  )
+
+;
+  }
+        $data = $data->withCount(['Attending_and_leaving as Absence'=> function ($query) {
       return $query->where('absence','!=',null);
      }]);
     
+if($request->name){
+  $data =   $data->where('name', 'LIKE', '%' . $request->name . '%');
+
+}
+    
+
   $data =   $data->paginate(10);
   
     return response()->json(['data'=>$data]);

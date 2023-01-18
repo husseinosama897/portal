@@ -239,9 +239,10 @@
                      </thead>
                      <tbody>
                         <tr  v-for=" (product,index) in  products" :key="product.id">
+                          <td></td>
                            <td><strong>{{index}}</strong></td>
                            <td style="width: 30%">
-                              <textarea v-if="product.dis" v-model="product.dis "
+                              <textarea v-model="product.dis "
                               
                               @input="autocompletez2(product.dis,index)"
 
@@ -252,12 +253,7 @@
 
                               style="max-height: 2.3rem;">
                               </textarea>
-                                                       <textarea v-else v-model="product.name " 
-                                                       
-                                                       @input="autocompletez2(product.name,index)"
-
-                                                       class="form-control" style="max-height: 2.3rem;">
-                              </textarea>
+                                  
 
                               <ul class="list-group"         v-if="choices_product.length > 0   && product.dis !== ''       && index == id">
   <li v-for="data in choices_product" @click="update(data,product)" :key="data.id" class="list-group-item">{{data.name}}</li>

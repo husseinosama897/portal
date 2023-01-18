@@ -8,5 +8,5 @@
         </div>
     </div>
 </div>
-<update-purchase :data="{{$data}}" :role='{{ \App\role::where('id', auth()->user()->role_id)->first() }}'></update-purchase>
+<update-purchase :data="{{$data}}" ></update-purchase>
 @endsection

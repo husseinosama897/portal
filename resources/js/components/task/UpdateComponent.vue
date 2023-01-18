@@ -151,19 +151,25 @@
             </div>
          </div>
       </div>
-      <div id="deathEmployeeModal" class="modal fade bd-example" style="overflow:auto;">
-         <div class="modal-dialog ">
-            <div class="modal-content" style="overflow:auto;">
-               <div class="alert alert-danger" role="alert">
+      <div class="modal fade bd-example-modal-lg"  id="deathEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true" style="overflow-y: auto;"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content"  
+      
+   >
+
+   <img src="/img/18915851.jpg" class="img-fluid" alt="Responsive image">
+ 
+   <div class="alert alert-danger" role="alert">
                   <h4 class="alert-heading"> فشلت العمليه  !</h4>
                   <p>    :  لقد فشلت العمليه للاسباب التاليه </p>
                   <p v-for="(err,index)  in allerros" :key="index"> {{err}}</p>
                   <hr>
-                  <input readonly type="button" class="btn btn-dark" data-dismiss="modal" value="الغاء">
+                  <input type="button" class="btn btn-dark" data-dismiss="modal" value="الغاء">
                </div>
-            </div>
-         </div>
-      </div>
+    </div>
+  </div>
+</div>
    </div>
 </template>
 <script>

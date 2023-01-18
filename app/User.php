@@ -56,6 +56,18 @@ public function daily_report(){
     return $this->hasMany(dailyReport::class,'supervisor_id');
 }
 
+
+public function timesheet_project_personal(){
+    return $this->hasMany(timesheet_project_personal::class,'user_id');
+ }
+
+ 
+ public function personal_overall(){
+    return $this->hasMany(personal_overall::class,'user_id');
+ }
+
+
+
 public function projectmanager()
 {
     return $this->HasMany(project::class,'projectmanager_id');

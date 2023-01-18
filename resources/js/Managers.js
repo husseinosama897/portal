@@ -7,11 +7,15 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+
+
 import draggable from 'vuedraggable'
+
 import VueApexCharts from 'vue-apexcharts'
 Vue.use(VueApexCharts)
 
 Vue.component('apexchart', VueApexCharts)
+
 Vue.use(require('vue-moment'));
 
 /**
@@ -383,16 +387,29 @@ Vue.component('update-laborers-manager', require('./components/managers/Laborers
 Vue.component('performance-laborers-manager', require('./components/managers/Laborers/PerformanceComponent.vue').default);
 
 
+
+
+
+
+
 Vue.component('manule-attending', require('./components/managers/Laborers/ManuleAttending.vue').default);
 
 // ---------- END HR -------------------
 
 Vue.component('add-user', require('./components/AddUser.vue').default);
 
+Vue.component('profile-component', require('./components/managers/Report/profile/ProfileComponent.vue').default);
 
+
+
+
+Vue.component('profile-chart-project_overall', require('./components/managers/Report/profile/OverAll.vue').default);
+
+
+
+//--------------------------------------------------------------
 
 Vue.component('edit-user', require('./components/EditUser.vue').default);
-
 
 Vue.component('table-user', require('./components/TableUser.vue').default);
 //--------------------------------- COST CENTER ---------------------------------
@@ -438,6 +455,47 @@ Vue.component('salary-component', require('./components/managers/salary/TableCom
 Vue.component('stock-component', require('./components/managers/report/StockComponent.vue').default);
 
 Vue.component('hr-component', require('./components/managers/report/HrComponent.vue').default);
+
+Vue.component('chart-timesheet-performance', require('./components/managers/report/ChartComponent.vue').default);
+
+Vue.component('table-timesheet-performance', require('./components/managers/report/PositionComponent.vue').default);
+
+
+Vue.component('depending-on-role', require('./components/managers/report/TimeSheet/DependingOnRole.vue').default);
+
+//--------------------- ------------- * * * project time sheet  * * * ------------------------------------
+Vue.component('project-time-sheet', require('./components/managers/report/TimeSheet/ProjectTimeSheet.vue').default);
+
+
+
+Vue.component('attendace-project-hours', require('./components/managers/report/TimeSheet/ChartsProject_hours.vue').default);
+
+
+
+Vue.component('charts-percentage-attendance', require('./components/managers/Report/TimeSheet/ChartsPercentageAttendance.vue').default);
+
+
+
+//-------------------------------------------------------------------------------------------------------
+
+
+Vue.component('chart-percentage-performance', require('./components/managers/Report/performance/ChartsPercentage.vue').default);
+
+Vue.component('chart-point-performance', require('./components/managers/Report/performance/ChartsPoint.vue').default);
+
+
+
+
+
+Vue.component('chart-project-overall', require('./components/managers/Report/project/OverAll.vue').default);
+
+
+Vue.component('chart-out-in', require('./components/managers/Report/project/CashOut_In.vue').default);
+
+
+
+
+
 
 
 
@@ -485,8 +543,9 @@ Vue.component('pagination', require('laravel-vue-pagination'));
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-// window.Event = new Vue();
- 
+var VueEventBus = require('vue-event-bus')
+Vue.use(VueEventBus,{name:'$eventbus'})
+
 const app = new Vue({
     el: '#app',
     draggable

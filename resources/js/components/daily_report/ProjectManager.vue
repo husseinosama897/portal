@@ -1,6 +1,23 @@
 <template>
      <div class="row">
                     <div class="col-lg-12">
+
+<div class="card">
+
+  <div class="card-body">
+
+<div class="col-4">
+
+  <select  v-model="project_id" class="form-control">
+    <option  ></option>
+    <option value="3" >test</option>
+  </select>
+</div>
+
+  </div>
+
+</div>
+
                         <div class="card">
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -73,7 +90,7 @@ return{
 
 datas:{},
 
-
+project_id:'',
 }
 
         },
@@ -101,7 +118,9 @@ this.datas.data.splice(index,1)
 		axios({
   method: 'post',
   url: '/daily_report/json_project_manager?page=' + page,
-
+data:{
+  project_id:this.project_id
+}
 })		.then(response => {
                     
               this.datas =  response.data.data
@@ -113,7 +132,9 @@ this.datas.data.splice(index,1)
 		axios({
   method: 'post',
   url: '/daily_report/json_project_manager' ,
-
+  data:{
+  project_id:this.project_id
+}
 })		.then(response => {
                     
               this.datas =  response.data.data
@@ -130,5 +151,10 @@ this.datas.data.splice(index,1)
     
     },
    
+    watch:{
+      'project_id':function(){
+        this.datajson()
+      }
+    }
     }
 </script>

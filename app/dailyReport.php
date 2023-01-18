@@ -28,7 +28,7 @@ class dailyReport extends Model
     }
 
     public function project(){
-      return $this->belongsto(User::Class,'project_id');
+      return $this->belongsto(project::Class,'project_id');
     }
     
     public function daily_productivity(){

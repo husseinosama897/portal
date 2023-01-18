@@ -19,7 +19,7 @@
 
 :matrial_requestworkflow="{{$matrial_requestworkflow}}"
 
-
+:projects="{{$projects}}"
 ></dcc-projectmanager>
 
 @endsection

@@ -198,14 +198,14 @@ $Subcontractorz = \App\subcontractor::where('status',0)->count();
             
 
 
-            @if (auth()->user()->admin == 1)
+         
             <li class="side-nav-item">
                 <a href="{{ route('project.index') }}" class="side-nav-link">
                     <i class="uil-briefcase"></i>
                     <span> Projects </span>
                 </a>
             </li>
-            @endif
+  
                  
 
             

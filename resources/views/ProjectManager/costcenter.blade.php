@@ -8,6 +8,6 @@
     </div>
 </div>
 
-<report-component project="{{auth()->user()->projectmanager->id}}"  ></report-component>
+<report-component :projects="{{$projects}}"  ></report-component>
 
 @endsection

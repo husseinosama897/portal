@@ -8,7 +8,7 @@
         </div>
     </div>
 </div>
-<site-create-component></site-create-component>
+<site-create-component  refdata="{{$ref}}" ></site-create-component>
 @endsection
 
 @section('style')

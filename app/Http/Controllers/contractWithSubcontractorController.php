@@ -16,6 +16,7 @@ use App\attributes_contract;
 use App\contract_withsubcontractor_attachment;
 use Validator;
 use App\Events\NotificationEvent;
+use Illuminate\Support\Str;
 use App\Exceptions\CustomException;
 class contractWithSubcontractorController extends Controller
 {
@@ -312,7 +313,8 @@ $data =  $this->validate($request,[
 
  $attributes = json_decode($request->attribute,true);
  $scling = [];
-  foreach($data as $d){
+ if(!empty($data)){
+    foreach($data as $d){
 
 
     
@@ -321,7 +323,9 @@ $scling[] = [
     'condition'=> $d['dis'] ?? null,
 ];
  }
-
+  
+ }
+ 
 $chunk = array_chunk($scling,3);
 
 foreach($chunk as $ch)
@@ -367,7 +371,7 @@ if($request->count > 0){
             $image_tmp->move('uploads/withcontract_withsubcontractor', $fileName);
    
       $files[] = [
-                   'withcontract_withsubcontractor_id'=>$petty_cash->id,
+                   'contract_withsubcontractor_id'=>$contract_withsubcontractor->id,
                    'path'=>$fileName,
                   ];
         ++$counter;
@@ -442,9 +446,7 @@ foreach( $workflow->role->user as $flow){
      }
   
      public function delete(contract_withsubcontractor $contract_withsubcontractor){
-   
             $contract_withsubcontractor->delete();
-         
 }
 
 }

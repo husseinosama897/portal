@@ -1,24 +1,32 @@
 <template>
      <div class="row">
+
+
                   <div class="card  mt-3">
                                   <div class="card-body">
                                     <form class=" align-items-center">
                                         <div class="row ">
-                                          
+                                          <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">
+                                            <label for="birthday"> project</label>
+                                          <select  v-model="project_id" class="form-control">
+  <option  ></option>
+  <option  v-for="project in projects" :value="project.id" :key="project.id" >{{project.name}}</option>
+</select></div>
+
                                             <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">
-                                                <label for="birthday">اسم العامل</label>
+                                                <label for="birthday"> user</label>
                                                 <input @input="datajson"  v-model="employee" type="text" id="birthday" name="birthday" class="form-control">
 
                                             </div>
                               
 
                                             <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">
-                                                <label for="birthday">من</label>
+                                                <label for="birthday">from</label>
                                                 <input  v-model="from" @input="datajson" type="date" id="birthday" name="birthday" class="form-control">
 
                                             </div>
                                             <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">
-                                                <label>إلي</label>
+                                                <label>to</label>
                                                 <input v-model="to" @input="datajson" type="date" id="birthday" name="birthday" class="form-control">
 
                                             </div>
@@ -146,10 +154,10 @@
 <script>
   import moment from 'moment'
     export default {
-      
+      props:['projects'],
         data(){
 return{
- projects:[],
+
  project_id:'',
  employee:'',
  working_day:'',
@@ -181,8 +189,8 @@ customizing(){
  if(this.datas.data && this.datas.data.length > 0){
  this.datas.data.forEach(e=>{
   if(e.contract){
-    var min = (e.attending_and_leaving_sum_min ) / 60
-     var time =(e.attending_and_leaving_sum_time_difference  )  + (min)
+    
+     var time =(e.timesheet_project_personal_time ) 
  time = Math.round(time)
 
  var salaryPerDay = (Number(e.contract.salary_per_month ) / Number(this.working_day))
@@ -314,8 +322,16 @@ data:{
 this.working_day = moment(this.from, "YYYY-MM").daysInMonth()
 
      this.datajson()
-     this.projectz()
+  
         },
    
+
+        watch:{
+        'project_id':function(){
+          this.datajson()
+
+        }
+       }
+
     }
 </script>

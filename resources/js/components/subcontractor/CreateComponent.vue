@@ -2,7 +2,7 @@
    <div >
 
 
-      <div class="alert alert-danger"  v-if=" projectselected &&   projectselected.subcontractor_budget < totalAmount" role="alert">
+      <div class="alert alert-danger"  v-if=" projectselected &&   projectselected.subcontractor_budget < total_expenses" role="alert">
  the current budget less than your order 
 </div>
 
@@ -207,7 +207,7 @@ The rest of the contract value less than your order
                            <td>     <input v-model="product.unit" readonly class="form-control"></td>
                            <td>     <input v-model="product.expctedqty" readonly class="form-control"></td>
                            <td>     <input v-model="product.previous_qty" readonly class="form-control"></td>
-                           <td>     <input v-model="product.currentqty"  :class="product.error ? 'form-control is-invalid' : 'form-control'" >
+                           <td>     <input v-model="product.currentqty "  :class="product.error ? 'form-control is-invalid' : 'form-control'" >
                            
                            
                               <div id="validationServerUsernameFeedback" v-if="product.error" e class="invalid-feedback">
@@ -295,7 +295,7 @@ The rest of the contract value less than your order
                      <div class="card">
                         <div class="card-header">
                            
-                           <button class="btn btn-primary"  v-if="The_rest_of_the_contract_value >=  0 && error == false  && projectselected.subcontractor_budget >= totalAmount"  type="submit">
+                           <button class="btn btn-primary"  v-if="The_rest_of_the_contract_value >=  0 && error == false  && projectselected.subcontractor_budget >= total_expenses"  type="submit">
                            submit
                            </button>
                            <button class="btn btn-primary" @click="submit2()"  type="button">
@@ -311,6 +311,27 @@ The rest of the contract value less than your order
             </div>
          </div>
       </form>
+
+      <div class="modal fade bd-example-modal-lg"  id="LowBudgetModal" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true" style="overflow-y: auto;"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content"  
+      
+   >
+
+   <img src="/img/2086.jpg" class="img-fluid" alt="Responsive image">
+ 
+   <div class="alert alert-danger" role="alert">
+                  <h4 class="alert-heading">  the current budget less than your order </h4>
+         
+               
+                  <hr>
+                  <input type="button" class="btn btn-dark" data-dismiss="modal" value="close">
+               </div>
+    </div>
+  </div>
+</div>
+
       <div id="editEmployeeModal" class="modal fade bd-example-modal-sm" style="overflow:auto;">
          <div class="modal-dialog ">
             <div class="modal-content" style="overflow:auto;">
@@ -326,19 +347,25 @@ The rest of the contract value less than your order
             </div>
          </div>
       </div>
-      <div id="deathEmployeeModal" class="modal fade bd-example" style="overflow:auto;">
-         <div class="modal-dialog ">
-            <div class="modal-content" style="overflow:auto;">
-               <div class="alert alert-danger" role="alert">
+      <div class="modal fade bd-example-modal-lg"  id="deathEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true" style="overflow-y: auto;"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content"  
+      
+   >
+
+   <img src="/img/18915851.jpg" class="img-fluid" alt="Responsive image">
+ 
+   <div class="alert alert-danger" role="alert">
                   <h4 class="alert-heading"> فشلت العمليه  !</h4>
                   <p>    :  لقد فشلت العمليه للاسباب التاليه </p>
                   <p v-for="(err,index)  in allerros" :key="index"> {{err}}</p>
                   <hr>
                   <input type="button" class="btn btn-dark" data-dismiss="modal" value="الغاء">
                </div>
-            </div>
-         </div>
-      </div>
+    </div>
+  </div>
+</div>
    </div>
 </template>
 <script>
@@ -352,7 +379,7 @@ return{
 cws:{},
 quotation:'',
 project_id:this.projectt,
-products:this.attributes,
+products:[],
 projects:[],
 allerros:[],
 no_vat:false,
@@ -657,6 +684,7 @@ this.payment.splice(index,1)
                         
                         var dataa =     this.$cookies.get('subcontractor')  ?? {};
 if(Object.keys(dataa).length > 0){
+
    this.ref = dataa.ref  ? dataa.ref : this.refdata,
  this.payment = dataa.note ? dataa.note :null,
 this.to = dataa.to ?  dataa.to:  null
@@ -664,7 +692,27 @@ this.totalAmount = dataa.total ? dataa.total : 0
  this.contract_on =dataa.contract_on  ? dataa.contract_on : this.contract_on
 this.Vat = dataa.vat ? dataa.vat : 0,
 this.products = dataa.attributes ?  dataa.attributes : this.attributes
+
  this.subject = dataa.subject ? dataa.subject : null
+
+}else{
+   this.attributes.forEach(e=>{
+
+this.products.push({
+ Excution_percentage:e.Excution_percentage,
+ contract_withsubcontractor_id:e.contract_withsubcontractor_id,
+ currentqty:0,
+ expctedqty:e.expctedqty,
+ id:e.id,
+ name:e.name,
+ previous_qty:e.previous_qty,
+ qty:e.qty,
+ total:e.total,
+ unit_price: e.unit_price,
+ unit:e.unit,
+})
+
+})
 
 }
 
@@ -684,18 +732,21 @@ return total
 
                scaling(){
 this.products.forEach(e=>{
-
-
-   e.currentqty = e.currentqty ?? 0
    
+  
+   var total = (Number(e.currentqty ) + Number(e.previous_qty))
+   
+e.error = e.expctedqty < total  && total >= 0  ? true : false
+
+if(e.Excution_percentage){
    e.qty = (Number(e.currentqty) + Number(e.previous_qty))
    e.Excution_percentage = e.Excution_percentage ?? 0
   var Excution_value = (Number(e.unit_price) * Number(e.qty) * Number(e.Excution_percentage) / 100  )
   Excution_value = (Excution_value).toFixed(2)
    e.total = Number(Excution_value)
 
-e.error = e.expctedqty < (Number(e.currentqty) + Number(e.previous_qty)) ? true : false
 
+}
 
 })
 
@@ -721,7 +772,7 @@ return this.products
                  var sum = 0;
    if(this.scaling.length > 0){
    this.scaling.forEach(e=>{
-   
+      
    sum =  ( Number(sum) + Number(e.total)   ) 
   
    
@@ -744,7 +795,9 @@ return rest
 
 
    
-
+total_expenses(){
+return this.totalAmount + this.Vat + this.projectselected.subcontractor_expenses
+},
 
                      Vat: function () {
                  var sum = 0;
@@ -759,6 +812,18 @@ sum = (Number(15) * Number(this.totalAmount) / Number(100)) ?? 0
    
    },
        },
+      
+
+       watch:{
+         'total_expenses':function(){
+            if(this.total_expenses  >= this.projectselected.subcontractor_expenses){
+
+               window.$("#LowBudgetModal").modal("show"); 
+      
+
+            }
+         }
+       }
 
        
     }

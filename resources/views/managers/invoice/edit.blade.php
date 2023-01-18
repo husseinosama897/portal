@@ -1,6 +1,5 @@
 
-@extends('layouts.NewApp')
-
+@extends('layouts.NewManage')
 @section('content')
 <div class="row">
     <div class="col-12">

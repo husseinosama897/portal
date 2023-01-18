@@ -213,7 +213,7 @@ if(item == undefined){
 
 var salary_per_month = (Number(e.contract.salary_per_month) * Number(diff))
 
-var perhour = (Number(salary_per_month) / Number(time))
+var perhour = (Number(salary_per_month ?? 0) / Number(time ?? 0))
   this.contries.push({time:time,country:e.contract.country,salary_per_month:salary_per_month,number:1,perhour:perhour})
 }else{
 

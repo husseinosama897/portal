@@ -52,12 +52,20 @@ public function Attending_and_leaving(){
 
    }
 
-   public function project_report(){
+   public function project_overall(){
+      return $this->hasMany(project_overall::class,'project_id')->orderby('date','ASC');
+   }
 
-      return $this->HasMany(project_report::class,'project_id');
   
-     }
 
+public function timesheet_project_personal(){
+   return $this->hasMany(timesheet_project_personal::class,'project_id');
+}
+
+
+public function project_report(){
+   return $this->hasMany(project_report::class,'project_id');
+}
    
    public function matrial_request(){
 

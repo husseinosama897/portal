@@ -10,6 +10,21 @@ use Storage;
 use App\Attending_and_leaving;
 use DB;
 use App\project;
+
+use App\timesheet_monthly_personal;
+use App\timesheet_monthly_project;
+use App\timesheet_monthly_section;
+use App\timesheet_daily_role;
+use App\timesheet_monthly_role;
+use App\timesheet_daily_section;
+use App\timesheet_daily_project;
+use App\timesheet_project_personal;
+use DatePeriod;
+use DateInterval;
+use DateTime;
+use App\project_overall;
+use App\personal_overall;
+use App\Jobs\hearing_process_attendance;
 class laborerattendingController extends Controller
 {
 
@@ -61,7 +76,10 @@ if($request->type== 1){
 if($totalMin >= 55){
 $totalDuration += 1;
 $totalMin = 0;
+}else{
+  $totalDuration += $totalMin / 100;
 }
+
 
 
 $attendance = [];
@@ -74,18 +92,29 @@ $attendance = [];
 'attending_leaving'=> $request->type == 1 ? $request->to : null,
 'absence' => $request->type == 2 ? Carbon::parse($request->from)->format('d/m/Y') : null   ,
 'time_difference'=> $request->type == 1 ? $totalDuration : null,
-'min'=> $request->type == 1 ? $totalMin : null,
+
 'project_id'=>$request['project_id']
     ];
   }
 
 
-  $chunkfille = array_chunk($attendance, 3);
 
-foreach($chunkfille as $chunk){
-  Attending_and_leaving::insert($chunk);
+  $array_chunk = array_chunk($attendance,100);
 
-}
+
+  foreach($array_chunk as $chunk){
+    Attending_and_leaving::insert($chunk);
+  
+  }
+
+
+  foreach($attendance as $chunk){
+  
+    $job = (new hearing_process_attendance($attendance))->delay(Carbon::now()->addSeconds(90));
+
+    $this->dispatch($job);
+
+  }
  
 
 
@@ -163,13 +192,12 @@ if(!empty(auth()->user()->contract)){
 
   
 
-        
+   try{
 
-      if(!empty($Attending_and_leaving)){
-       
- 
+    DB::transaction(function () use ($request,$project,$Attending_and_leaving,$check) {
+
+      if(!empty($Attending_and_leaving)){ 
         $startTime = Carbon::createFromFormat('Y-m-d H:i:s',$Attending_and_leaving->attending_time);
-
         $endTime = Carbon::now()->timezone('Asia/Riyadh');
        
         $endTime = Carbon::createFromFormat('Y-m-d H:i:s',$endTime)->timezone('Asia/Riyadh');
@@ -178,6 +206,34 @@ if(!empty(auth()->user()->contract)){
         $totalMin =  $startTime->diffInMinutes($endTime)  - 60 * $totalDuration;
     
      
+        # We calculate the number of vacation days during the month 
+
+        $start = new DateTime(Carbon::now()->startOfMonth());
+        $end = new DateTime(Carbon::now()->format('Y-m-d'));
+        
+        $interval = new DateInterval('P1D');
+        $daterange = new DatePeriod($start, $interval ,$end);
+        
+        $weekends = 0;
+        foreach($daterange as $date){
+            $days = $date->format('D');
+            if ($days == 'Fri') { # we set friday
+                $weekends++;
+            }
+        }
+
+        # here we calculate the difference between the start of month and now
+      $st1 = Carbon::now()->startOfMonth();
+      $st2 = Carbon::now();
+  
+
+        $diff = $st2->diffInDays(Carbon::parse($st1));
+
+#then we calculate wokring days 
+
+$working_days = ($diff - $weekends  );
+
+
 if($totalMin >= 55){
 $totalDuration += 1;
 $totalMin = 0;
@@ -188,23 +244,355 @@ $totalMin = 0;
             'time_difference'=> $totalDuration,
        //     'leaving_image'=>$imageName,
         'min'=>$totalMin
+
+
         ]);
+$time = ($totalMin / 100 + $totalDuration);
+// ----------------------------- * * * MONTHLY time sheet Personal project * * * ------------------------
+
+if($check->project->id !== null){
+
+  $timesheet_project_personal =     timesheet_project_personal::where(['project_id'=>$check->project->id,'user_id'=>auth()->user()->id,'date'=>Carbon::now()->startOfMonth()])->first();
+
+  if($timesheet_project_personal){
+    $timesheet_project_personal->increment(
+      'time',$time
+    );
+  }else{
+    $timesheet_project_personal =     timesheet_project_personal::create([
+      'project_id'=>$check->project->id,
+      'user_id'=>auth()->user()->id,
+    'date'=>Carbon::now()->startOfMonth(),
+  
+    'time'=>$time
+    
+    ]
+    
+    );
+  
+  }
+
+  
+}
+
+
+// ----------------------------- * * * end of MONTHLY time sheet Personal project * * * ------------------------
+
+
+
+
+// ---------------------------- * * * daily time sheet project * * * -------------------------------------
+  
+if($check->project->id !== null){
+
+$timesheet_daily_project =     timesheet_daily_project::where(['project_id'=>$check->project->id,'date'=>Carbon::now()->format('Y-m-d')])->first();
+
+if($timesheet_daily_project){
+  $timesheet_daily_project->increment(
+    'time',$time
+  );
+}else{
+  $timesheet_daily_project =     timesheet_daily_project::create([
+    'project_id'=>$check->project->id,
+  'date'=>Carbon::now()->format('Y-m-d'),
+  'time'=>$time
+  
+  ]
+  
+  );
+
+}
+
+
+}
+// ------------------------------ * * * end of daily time sheet  project * * * ----------------------------------
+
+
+
+
+
+
+
+
+// ---------------------------- * * * MONTHLY time sheet project * * * -------------------------------------
+  
+if($check->project->id !== null){
+
+$number = 10; # this test  number of workers 
+
+
+$project_overall = project_overall::where(['date'=>Carbon::now()->startOfMonth(),'project_id'=>$this->project])->first();
+
+$numbers_util_now = $number  * $working_days;
+$increment = 1  *  100  / $numbers_util_now;
+
+  if($project_overall){
+ 
+$old =  $project_overall->num_of_attendance * $numbers_util_now / 100 ;
+
+        $project_overall->update([
+    
+    
+            'percentage_attendance'=>($old   + $increment ),
+          
+      
+          ]);
+    
+          $project_overall->increment('time_attendance',$time);
+    
+    
+
+    
+
+  
+  }else{
+ 
+        project_overall::create([
+            'date'=>Carbon::now()->startOfMonth(),
+            'percentage_performance'=>0,
+            'cash_out'=>0,
+            'percentage_attendance'=>($increment ),
+            'cash_in'=>0,
+            'num_of_performers'=>0,
+            'num_of_attendance'=>1,
+            'performance_point'=>0,
+            'time_attendance'=>$time,
+         
+            'project_id'=>$check->project->id
+        ]);
+    
+    
+    
+
+  
+  
+  }
+  
+  
+  }
+  // ------------------------------ * * * end of MONTHLY time sheet  project * * * ----------------------------------
+  
+
+
+
+
+
+
+
+  // ---------------------------- * * * daily time sheet section * * * -------------------------------------
+  
+if(!empty(auth()->user()->role) ){
+
+  $timesheet_daily_section =     timesheet_daily_section::where(['section_id'=>auth()->user()->role->section_id,'date'=>Carbon::now()->format('Y-m-d')])->first();
+  
+  if($timesheet_daily_section){
+    $timesheet_daily_section->increment(
+      'time',$time
+    );
+  }else{
+    $timesheet_daily_section =     timesheet_daily_section::create([
+      'section_id'=>auth()->user()->role->section_id,
+    'date'=>Carbon::now()->format('Y-m-d'),
+    'time'=>$time
+    
+    ]
+    
+    );
+  
+  }
+  
+  
+  }
+  // ------------------------------ * * * end of daily time sheet  project * * * ----------------------------------
+  
+  
+  
+  
+  
+  
+  
+  
+  // ---------------------------- * * * MONTHLY time sheet section * * * -------------------------------------
+    
+  if(!empty(auth()->user()->role)){
+  
+    $timesheet_monthly_section =     timesheet_monthly_section::where(['section_id'=>auth()->user()->role->section_id,'date'=>Carbon::now()->startOfMonth(),])->first();
+    
+    if($timesheet_monthly_section){
+      $timesheet_monthly_section->increment(
+        'time',$time
+      );
+    }else{
+      $timesheet_monthly_section =     timesheet_monthly_section::create([
+        'section_id'=>auth()->user()->role->section_id,
+      'date'=>Carbon::now()->startOfMonth(),
+    
+      'time'=>$time
+      
+      ]
+      
+      );
+    
+    }
+    
+    
+    }
+    // ------------------------------ * * * end of MONTHLY time sheet  section * * * ----------------------------------
+    
+  
+  
+  
+  
+  
+  
+    
+
+
+
+      // ---------------------------- * * * daily time sheet role * * * -------------------------------------
+  
+if(!empty(auth()->user()->role()) ){
+
+  $timesheet_daily_role =     timesheet_daily_role::where(['role_id'=>auth()->user()->role->id,'date'=>Carbon::now()->format('Y-m-d')])->first();
+  
+  if($timesheet_daily_role){
+    $timesheet_daily_role->increment(
+      'time',$time
+    );
+  }else{
+    $timesheet_daily_role =     timesheet_daily_role::create([
+      'role_id'=>auth()->user()->role->id,
+    'date'=>Carbon::now()->format('Y-m-d'),
+    'time'=>$time
+    
+    ]
+    
+    );
+  
+  }
+  
+  
+  }
+  // ------------------------------ * * * end of daily time sheet  role * * * ----------------------------------
+  
+  
+  
+  
+  
+  
+  
+  
+  // ---------------------------- * * * MONTHLY time sheet role * * * -------------------------------------
+    
+  if(!empty(auth()->user()->role()) ){
+  
+    $timesheet_monthly_role =     timesheet_monthly_role::where(['role_id'=>auth()->user()->role->id,'date'=>Carbon::now()->startOfMonth(),])->first();
+    
+    if($timesheet_monthly_role){
+      $timesheet_monthly_role->increment(
+        'time',$time
+      );
+    }else{
+      $timesheet_daily_role =     timesheet_daily_role::create([
+        'role_id'=>auth()->user()->role->id,
+      'date'=>Carbon::now()->startOfMonth()
+    ,
+      'time'=>$time
+      
+      ]
+      
+      );
+    
+    }
+    
+    
+    }
+    // ------------------------------ * * * end of MONTHLY time sheet  section * * * ----------------------------------
+    
+
+
+
+
+
+
+
+
+ // ---------------------------- * * * MONTHLY time sheet personal * * * -------------------------------------
+    
+
+  $timesheet_monthly_personal =     personal_overall::where(['user_id'=>auth()->user()->id,'date'=>Carbon::now()->startOfMonth(),])->first();
+  $numbers_util_now = 1  * $working_days;
+$increment = 1  *  100  / $numbers_util_now;
+
+  if($timesheet_monthly_personal){
+ 
+$old =  $timesheet_monthly_personal->num_of_attendance * $numbers_util_now / 100 ;
+
+$timesheet_monthly_personal->update([
+    
+    
+  'percentage_attendance'=>($old   + $increment ),
+
+
+]);
+
+
+    $timesheet_monthly_personal->increment(
+      'time',$time
+    );
+    $timesheet_monthly_personal->increment(
+      'num_of_attendance',1
+    );
+  }else{
+    $timesheet_monthly_personal =     personal_overall::create([
+      'user_id'=>auth()->user()->id,
+    'date'=>Carbon::now()->startOfMonth()
+  ,
+    'time'=>$time,
+    'num_of_performers'=>0,
+    'num_of_attendance'=>1,
+    'percentage_performance'=>0,
+    'percentage_attendance'=>$increment,
+
+    
+    ]
+    
+    );
+  
+  }
+  
+  
+  
+  // ------------------------------ * * * end of MONTHLY time sheet  section * * * ----------------------------------
+  
+
+
+
       }else{
        
         Attending_and_leaving::create([
          'user_id'=>auth()->user()->id,
-        'project_id'=>$check->project->id,
+        'project_id'=>$check->project->id ?? null,
+        'section_id'=>$check->role->section_id ?? null,
         'attending_time'=>Carbon::now()->timezone('Asia/Riyadh'),
   //        'out_of_place'=>$request->out_of_place,
            'status'=>1,
          //  'attending_image'=>$imageName,
         ]);
 
+       
+
       }
 
       return view('succes');
+    });
+  }
+ catch (Exception $e) {
+     return $e;
+ }
     }
      
     }
+    
     }
 }

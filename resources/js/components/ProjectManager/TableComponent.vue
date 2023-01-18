@@ -1,5 +1,21 @@
 <template>
    <div class="row">
+      <div class="card">
+
+<div class="card-body">
+<div class="row">
+<div class="col-4">
+
+<select  v-model="project_id" class="form-control">
+  <option  ></option>
+  <option  v-for="project in projects" :value="project.id" :key="project.id" >{{project.name}}</option>
+</select>
+</div>
+</div>
+</div>
+
+</div>
+
       <div class="col-12">
          <div class="card">
             <div class="card-body">
@@ -46,7 +62,7 @@
 </template>
 <script>
     export default {
-        props:['subcontractor'],
+        props:['subcontractor','projects'],
         data(){
 return{
 
@@ -151,6 +167,9 @@ this.datas.data.splice(index,1)
   method: 'post',
   url: '/jsoncostcenter?page=' + page,
 
+  data:{
+   project_id:this.project_id
+  }
 })		.then(response => {
                     
               this.datas =  response.data.data
@@ -162,6 +181,9 @@ this.datas.data.splice(index,1)
 		axios({
   method: 'post',
   url: '/jsoncostcenter' ,
+  data:{
+   project_id:this.project_id
+  }
 
 })		.then(response => {
                     
@@ -208,64 +230,15 @@ if(this.project_id){
  window.$("#adz").modal("hide"); 
     })
 },
-submit1(){
-   
 
 
-         	const config = {
-
-                    headers: { 'content-type': 'multipart/form-data' }
-
-                }
-
-                let formData = new FormData();
-
-
-if(this.updating.name){
-	 formData.append('name', this.updating.name);
-}
-
-if(this.updating.project_id){
-	 formData.append('project_id', this.updating.project_id);
-}
-
-
-  
-if(this.updating.budget){
-	 formData.append('budget', this.updating.budget);
-}
-
-axios.post('/costcenterupdate/'+this.updating.id,formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data' },
-})
-   .then(res=>{
-       this.name = ''
-             window.$("#deathEmployeeModal").modal("hide"); 
-
-    })
-},
-
-addproduct(){
-    this.products.push({})
-},
-removeproduct(index){
-this.products.splice(index,1)
-}
- ,
  
- addpayment(){
-    this.payment.push({})
-},
-removepayment(index){
-this.payment.splice(index,1)
-}
- 
+
  },
         mounted() {
      this.datajson()
-     this.project()
-     this.getCostCenterSelectBoxwithoutprameter()
+
+   
         },
       
     }

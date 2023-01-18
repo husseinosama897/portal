@@ -1,5 +1,7 @@
 <template>
      <div class="row">
+
+
                   <div class="card  mt-3">
                                   <div class="card-body">
                                     <form class=" align-items-center">
@@ -285,6 +287,7 @@
       
         data(){
 return{
+  
  projects:[],
  project_id:'',
  employee:'',
@@ -310,6 +313,34 @@ attending_time:'',
 
 computed:{
 
+  classificationAndcleaingdata(){
+    var newData = []
+this.customizing.forEach(e=>{
+
+          let item  = newData.find(user=>
+  e.role.name == user.name
+)
+
+var newTime = (Number(e.time ?? 0) + Number(e.over_time ?? 0)) 
+if(item == undefined){
+newData.push({
+  name:e.role.name,
+  data:[
+    
+  [newTime,e.amount] 
+
+  ]
+})
+ 
+}else{
+  item.data.push([  newTime,e.amount ])
+}
+
+})
+
+return newData
+
+  },
 
 
 customizing(){
@@ -317,9 +348,11 @@ customizing(){
  if(this.datas.data && this.datas.data.length > 0){
  this.datas.data.forEach(e=>{
   if(e.contract){
-    var min = (e.attending_and_leaving_sum_min ) / 60
-     var time =(e.attending_and_leaving_sum_time_difference  )  + (min)
- time = Math.round(time)
+   
+     var time =(e.timesheet_project_personal_sum_time ?  e.timesheet_project_personal_sum_time : e.timesheet_monthly_personal_sum_time )
+     
+
+
 
  var salaryPerDay = (Number(e.contract.salary_per_month ) / Number(this.working_day))
   salaryPerDay = salaryPerDay.toFixed(2)
@@ -340,7 +373,7 @@ customizing(){
   var amount = (Number(overtime) * salaryperHour + Number(time) *  Number(salaryperHour)  - Absence )
   amount = amount.toFixed(2)
 
-newData.push({ time: time , name:e.name ,id:e.id,Deduction:Absence , contract:e.contract , salaryperHour:salaryperHour ,salaryPerDay:salaryPerDay,overtime:overtime ,amount:amount })
+newData.push({ time: time ?? 0 , name:e.name,role:e.role ,id:e.id,Deduction:Absence , contract:e.contract , salaryperHour:salaryperHour ,salaryPerDay:salaryPerDay,overtime:overtime ?? 0 ,amount:amount ?? 0 })
 
   }
 
@@ -499,6 +532,10 @@ axios({
 }
 })		.then(response => {
                     
+
+this.working_day = moment.duration(moment(this.to).diff(moment(this.from)));
+this.working_day = (parseInt(this.working_day.asDays()) + 1)
+
               this.datas =  response.data.data
             
                 })
@@ -513,11 +550,12 @@ axios({
 
           this.from = moment().startOf('month').format('YYYY-MM-DD');
  this.to = moment().endOf('month').format('YYYY-MM-DD');
-this.working_day = moment(this.from, "YYYY-MM").daysInMonth()
-
+this.working_day = moment.duration(moment(this.to).diff(moment(this.from)));
+this.working_day = (parseInt(this.working_day.asDays()) + 1)
      this.datajson()
      this.projectz()
         },
    
+
     }
 </script>

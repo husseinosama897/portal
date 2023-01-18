@@ -331,6 +331,7 @@ catch (Exception $e) {
                 return $q->where('product_id','=',null);
             }])->with('note')->first();
         if(!empty($data)){
+           
             return view('purchase.update')->with(['data'=>$data]);
         }
    // }
@@ -392,11 +393,12 @@ if($Purchase_order->total !== null){
 
 
 
- 
+ /*
 
  if($request->deletedfiles){
     purchase_order_attachment::find($request->deletedfiles)->delete();
  }
+ */
 
  $Purchase_order_cycle =  $Purchase_order->purchase_order_cycle()->delete();
  $workflow = workflow::where(['name'=>'purchase_order'])->first()->flowworkStep()
@@ -413,6 +415,7 @@ foreach($Purchase_order->note as $note){
  $rules = [
 
     'name'=> "required|string",
+        'percentage'=> "numeric",
 
 ];
 $payments = []; 
@@ -427,7 +430,7 @@ $payments = [];
             'percentage'=>$pay['percentage'] ?? null,
             'name'=>$pay['name']?? null,
   'amount'=>$pay['amount'] ?? null,
-        'date'=>$pay['date'] ?? null,  
+        'date'=>\Carbon\Carbon::parse($pay['date'])->format('Y-m-d') ?? null,  
             ];
         }else{
          
@@ -542,7 +545,7 @@ foreach($chunk_notification as $noti){
     
         if(!empty($attr['pivot']['product_id'])){
             $Purchase_order->attributes()->attach($attr['product_id'] ?? null,[
-                'dis'=>$attr['dis'] ?? null,
+                'dis'=>$attr['dis'] ?? $attr['name'],
                   'qty'=>$attr['pivot']['qty'],
                    'unit'=>$attr['pivot']['unit'],
                     'unit_price'=>$attr['pivot']['unit_price'],
@@ -552,7 +555,7 @@ foreach($chunk_notification as $noti){
                 
         }else{
             purchase_order_product::insert([
-                'dis'=>$attr['dis'],
+                       'dis'=>$attr['dis'] ?? $attr['name'],
                 'qty'=>$attr['qty'],
                 'product_id'=>null,
                  'unit'=>$attr['unit'],

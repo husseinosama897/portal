@@ -43,9 +43,37 @@ Vue.use(require('vue-moment'));
 // ------------------------- * * * ProjectManager * * * ------------------------------------------------------
 
 
-//------------------------------- * * * Time Sheet * * * -----------------------------------------------------
+//------------------- |||| ------------- manule attendance ----------  |||| --------------------------
+Vue.component('manule-attending', require('./components/ProjectManager/ManuleAttending.vue').default);
+
+
+
+//--------------------  |||| ----------- * * * Time Sheet * * * ------------   |||   -----------------------------------------
 
 Vue.component('time-sheet-projectmanager', require('./components/ProjectManager/TimeSheet.vue').default);
+
+//--------------------- |||    ----------- * * * charts * * * --------  |||   ----------------------------
+Vue.component('project-time-sheet', require('./components/ProjectManager/report/TimeSheet/ProjectTimeSheet.vue').default);
+
+
+Vue.component('attendace-project-hours', require('./components/ProjectManager/report/TimeSheet/ChartsProject_hours.vue').default);
+
+
+Vue.component('charts-percentage-attendance', require('./components/ProjectManager/Report/TimeSheet/ChartsPercentageAttendance.vue').default);
+
+
+Vue.component('chart-percentage-performance', require('./components/ProjectManager/Report/performance/ChartsPercentage.vue').default);
+
+Vue.component('chart-point-performance', require('./components/ProjectManager/Report/performance/ChartsPoint.vue').default);
+
+
+
+Vue.component('chart-project-overall', require('./components/ProjectManager/Report/project/OverAll.vue').default);
+
+
+Vue.component('chart-out-in', require('./components/ProjectManager/Report/project/CashOut_In.vue').default);
+
+
 
 
 // ----------------------------- * * * cost center * *  * ---------------------------------------------------------
@@ -76,6 +104,10 @@ Vue.component('dcc-projectmanager', require('./components/ProjectManager/DccComp
 // -------------------------- * * profile ** * ----------------------------------------------------------
 
 Vue.component('timesheet-user', require('./components/user/TimeSheet.vue').default);
+
+Vue.component('profile-component', require('./components/user/profile/ProfileComponent.vue').default);
+
+Vue.component('profile-chart-project_overall', require('./components/user/profile/OverAll.vue').default);
 
 
 // -------------------------- ** pricing supplierorder ** ------------------------------------------------
@@ -263,6 +295,9 @@ Vue.component('print-petty', require('./components/petty/PrintPetty.vue').defaul
 //--------------------------------------------------------------------------------
 
 
+
+
+
 import VueCookies from 'vue-cookies'
 Vue.use(VueCookies)
 Vue.$cookies.config('1d')
@@ -307,6 +342,11 @@ Vue.component('laborers-component', require('./components/LaborersPage.vue').def
 
 
 
+
+
+
+
+
 import VueHtmlToPaper from 'vue-html-to-paper';
 
 const options = {
@@ -342,6 +382,8 @@ Vue.use(Print);
 require('bootstrap/js/dist/modal');
 
 Vue.component('pagination', require('laravel-vue-pagination'));
+var VueEventBus = require('vue-event-bus')
+Vue.use(VueEventBus,{name:'$eventbus'})
 
 
 /**

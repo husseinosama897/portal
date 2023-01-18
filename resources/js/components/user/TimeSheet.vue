@@ -6,15 +6,6 @@
                                         <div class="row ">
                                           
             
-                                             <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">
-                                                 <label for="birthday">المشروع </label>
-   <div class="form-group">
-                                  <select class="form-select select2" @change="datajson" v-model="project_id">
-                              <option  value=""></option>
-                                 <option v-for="project in projects" :key="project.id" :value="project.id" >{{project.name}}</option>
-                              </select>
-                           </div>
-                           </div>
 
                                             <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">
                                                 <label for="birthday">من</label>

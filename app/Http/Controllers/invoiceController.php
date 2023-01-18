@@ -5,13 +5,19 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\invoice;
 use App\report;
+use App\project_overall;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 class invoiceController extends Controller
 {
     
     public function insert_invoice(request $request){
 $this->validate($request,[
+'project_id'=>['required','numeric'],
+'date'=>['required','date'],
 
+'subtotal'=>['numeric'],
+'description'=>['string'],
 ]);
 if($request->file){
     $image_tmp = $request->file;
@@ -29,7 +35,7 @@ if($request->file){
 $inv = invoice::create([
     'code'=>$request->code,
     'project_id'=>$request->project_id,
-    'customer_id'=>$request->customer_id,
+//    'customer_id'=>$request->customer_id,
     'subtotal'=>$request->subtotal,
      'vat'=>$request->vat,
      'total'=>$request->total,
@@ -38,7 +44,7 @@ $inv = invoice::create([
     'description'=>$request->description
 ]);
         
-
+//------------------------- general report --------------------------
 $report =   report::where('date',$inv->date)->increment('total_cash_out',$inv->total);
 
 if(empty($report)){
@@ -47,8 +53,40 @@ if(empty($report)){
    'total_cash_out'=>$inv->total,
  ]);
 }  
+//-----------------------------------------------------------------
 
 
+
+
+
+
+// -------------------------------- project report ------------------------------------------------
+$project_overall = project_overall::where(['date'=>Carbon::now()->startOfMonth(),'project_id'=>$inv->project_id])->first();
+
+  if($project_overall){
+
+          $project_overall->increment('cash_in',$inv->total);
+    
+  }else{
+ 
+        project_overall::create([
+            'date'=>Carbon::now()->startOfMonth(),
+            'percentage_performance'=>0,
+            'cash_out'=>0,
+            'percentage_attendance'=>0,
+            'cash_in'=>$inv->total,
+            'num_of_performers'=>0,
+            'num_of_attendance'=>0,
+            'performance_point'=>0,
+            'time_attendance'=>0,
+            'project_id'=>$inv->project_id
+        ]);
+    
+  
+  }
+
+
+//---------------------------------------------------------------
     }
 
 

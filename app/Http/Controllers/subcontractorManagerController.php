@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use DB;
 use App\workflow;
 use Illuminate\Support\Str;
+use App\project_overall;
 use App\flowworkStep;
 use Carbon\Carbon;
 use App\subcontractor_request_cycle;
@@ -193,9 +194,9 @@ NotificationEvent::dispatch($subcontractor->user->id,$content);
 'status'=>1,
                 ]);
               
-                
+                // -------------------------  project expenses -------------------------------------
                 $subcontractor->project->increment('subcontractor_expenses',$subcontractor->total);
-
+//-------------------------------------------- general report ----------------------------------------
 
                 
                 $report =   report::where('date',$subcontractor->date)->increment('total_cash_out',$subcontractor->total);
@@ -206,8 +207,39 @@ NotificationEvent::dispatch($subcontractor->user->id,$content);
                    'total_cash_out'=>$subcontractor->total,
                  ]);
                 }  
+// -------------------------------------------------------------------------------------------------------
 
 
+//---------------------------------- project report -------------------------------------------------
+
+$project_overall = project_overall::where(['date'=>Carbon::now()->startOfMonth(),'project_id'=>$subcontractor->project_id])->first();
+
+  if($project_overall){
+
+          $project_overall->increment('cash_out',$subcontractor->total);
+    
+  }else{
+ 
+        project_overall::create([
+            'date'=>Carbon::now()->startOfMonth(),
+            'percentage_performance'=>0,
+            'cash_out'=>$subcontractor->total,
+            'percentage_attendance'=>0,
+            'cash_in'=>0,
+            'num_of_performers'=>0,
+            'num_of_attendance'=>0,
+            'performance_point'=>0,
+            'time_attendance'=>0,
+            'project_id'=>$subcontractor->project_id
+        ]);
+    
+    
+    
+
+  
+  
+  }
+  //------------------------------------------------------------------------------------------
 
  $data =   \App\attributes_contract::where('contract_withsubcontractor_id',$subcontractor->contract_withsubcontractor_id)->get();
 

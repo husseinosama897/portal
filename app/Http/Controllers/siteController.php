@@ -160,7 +160,13 @@ class siteController extends Controller
     }
  
     public function create(){
-        return view('site.create');
+
+        $data = site::latest()->first();
+        $explode = explode("-",$data->ref ?? 'SI-'.''.'0');
+
+        return view('site.create')->with(['ref'=>'SI-'.''.$explode[1] + 1]);
+
+     
     }
 
 

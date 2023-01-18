@@ -221,7 +221,29 @@
                                   </main>
                               </div>
                           </div>
+
+                          <div class="modal fade bd-example-modal-lg"  id="deathEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true" style="overflow-y: auto;"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content"  
+      
+   >
+
+   <img src="/img/18915851.jpg" class="img-fluid" alt="Responsive image">
+ 
+   <div class="alert alert-danger" role="alert">
+                  <h4 class="alert-heading"> فشلت العمليه  !</h4>
+                  <p>    :  لقد فشلت العمليه للاسباب التاليه </p>
+                  <p v-for="(err,index)  in allerros" :key="index"> {{err}}</p>
+                  <hr>
+                  <input type="button" class="btn btn-dark" data-dismiss="modal" value="الغاء">
+               </div>
+    </div>
+  </div>
+</div>
+
                           </div>
+
             
 </template>
 
@@ -387,8 +409,27 @@ this.building_num = '',
 this.street_name= '',
    this.city= '',
 this.email= ''
+    }).catch(error=>{
+ if (error.response.status == 422){
+
+     if(Array.isArray(error.response.data.errors)){
+         this.allerros = error.response.data.errors;
+     }else{
+         try {
+  this.allerros = JSON.parse(error.response.data.message);
+         }
+         catch{
+                this.allerros = error.response.data.errors;
+         }
+     }
+      
+         window.$("#deathEmployeeModal").modal("show"); 
+       
+      }
     })
-  }
+
+  },
 }
+ 
     }
 </script>

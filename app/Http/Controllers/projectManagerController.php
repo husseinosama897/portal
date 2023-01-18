@@ -18,6 +18,12 @@ use App\salary;
 use App\project;
 use App\project_report;
 use App\User;
+use App\Report\timesheet_monthly_personal;
+use App\Report\timesheet_monthly_project;
+use App\Report\timesheet_daily_project;
+use App\Report\timesheet_project_personal;
+use App\Attending_and_leaving;
+use App\Jobs\hearing_process_attendance;
 class projectManagerController extends Controller
 {
     
@@ -25,11 +31,23 @@ class projectManagerController extends Controller
 
      
       
-      public function matrial_requestdata(){
+      public function matrial_requestdata(request $request){
         //-------------- matrial_request -----------------------
       
-          $matrial_request = auth()->user()->projectmanager->matrial_request();
-          
+        if(auth()->user()->projectmanager()->count() > 1){
+
+          $this->validate($request,[
+              'project_id'=>['numeric','required','exists:projects,id']
+          ]);
+  
+          $matrial_request = auth()->user()->projectmanager->where('id',$request->project_id)->first();
+  
+          $matrial_request =  $matrial_request->matrial_request();
+      }else{
+          $matrial_request = auth()->user()->projectmanager()->first();
+          $matrial_request = $matrial_request->matrial_request();
+      }
+
           $matrial_request = $matrial_request->with(['user'=>function($q){
           return $q->select(['id','name']);
                 }])->with(['matrial_request_cycle'=>function($q){
@@ -46,10 +64,23 @@ class projectManagerController extends Controller
       
       
       
-        public function subcontractordata(){
+        public function subcontractordata(request $request){
             //-------------- subcontractor -----------------------
+            if(auth()->user()->projectmanager()->count() > 1){
+
+              $this->validate($request,[
+                  'project_id'=>['numeric','required','exists:projects,id']
+              ]);
       
-              $subcontractor = auth()->user()->projectmanager->subcontractor();
+              $subcontractor = auth()->user()->projectmanager->where('id',$request->project_id)->first();
+      
+              $subcontractor =  $subcontractor->subcontractor();
+          }else{
+              $subcontractor = auth()->user()->projectmanager()->first();
+              $subcontractor = $subcontractor->subcontractor();
+          }
+              
+             
               
               $subcontractor = $subcontractor->with(['user'=>function($q){
               return $q->select(['id','name']);
@@ -66,9 +97,24 @@ class projectManagerController extends Controller
         }
         
         
-      public function summary(){
-           $report = auth()->user()->projectmanager->project_report()->select(['total_cash_in','total_cash_out','date','project_id'])->orderBy('date','ASC')->get();
-      
+      public function summary(request $request){
+
+
+           if(auth()->user()->projectmanager()->count() > 1){
+
+            $this->validate($request,[
+                'project_id'=>['numeric','required','exists:projects,id']
+            ]);
+    
+            $report = auth()->user()->projectmanager->where('id',$request->project_id)->first();
+    
+            $report =  $report->project_report()->get();
+        }else{
+            $report = auth()->user()->projectmanager()->first();
+            $report = $report->project_report()->get();
+        }
+            
+
            return response()->json(['data'=>$report]);
       }
       
@@ -79,12 +125,27 @@ class projectManagerController extends Controller
       
           //----------------** Purchase_order ---------------------------
       
-         
-            $Purchase_order =  auth()->user()->projectmanager->Purchase_order();
+  
+            
+           if(auth()->user()->projectmanager()->count() > 1){
+
+            $this->validate($request,[
+                'project_id'=>['numeric','required','exists:projects,id']
+            ]);
+    
+            $Purchase_order = auth()->user()->projectmanager->where('id',$request->project_id)->first();
+    
+            $Purchase_order =  $Purchase_order->purchase_order();
+        }else{
+            $Purchase_order = auth()->user()->projectmanager()->first();
+            $Purchase_order = $Purchase_order->purchase_order();
+        }
+
+
       
             $Purchase_order =   $Purchase_order->with(['user'=>function($q){
               return $q->select(['id','name']);
-                    }])->where('draft','!=',1)->with(['purchase_order_cycle'=>function($q){
+                    }])->with(['purchase_order_cycle'=>function($q){
                       return $q->with('role');
                        }]);
       
@@ -104,9 +165,22 @@ class projectManagerController extends Controller
       //------------------------**  petty cash  ---------------------------------
       
       
-            $petty_cash =  auth()->user()->projectmanager->petty_cash();
-      
   
+            if(auth()->user()->projectmanager()->count() > 1){
+
+              $this->validate($request,[
+                  'project_id'=>['numeric','required','exists:projects,id']
+              ]);
+      
+              $petty_cash = auth()->user()->projectmanager->where('id',$request->project_id)->first();
+      
+              $petty_cash =  $petty_cash->petty_cash();
+          }else{
+              $petty_cash = auth()->user()->projectmanager()->first();
+              $petty_cash = $petty_cash->petty_cash();
+          }
+
+          
            $petty_cash = $petty_cash-> with(['user'=>function($q){
               return $q->select(['id','name']);
                     }])->with(['petty_cash_cycle'=>function($q){
@@ -143,10 +217,14 @@ class projectManagerController extends Controller
                     return     $q->with('role');
                      }])->first();
       
+                     $projects = auth()->user()->projectmanager()->select(['id','projectmanager_id','name'])->get();
+            
+
       
             return view('ProjectManager.dcc')->with(['purchase_orderworkflow'=>$purchase_orderworkflow,'subcontrctorworkflow'=>$subcontrctorworkflow,
           'matrial_requestworkflow'=>$matrial_requestworkflow,
           'petty_cashworkflow'=>$petty_cashworkflow,
+          'projects'=>$projects
           
           ]);
           }
@@ -154,9 +232,24 @@ class projectManagerController extends Controller
 
           /** ------------------------     end of dcc ------------------------------------------- */
 
-          public function costcenterjson($project){
-            if(is_numeric($project)){
-                $data = project::where('id',$project)->with(['purchase_order'=>function($q){
+          public function costcenterjson(request $request){
+          
+
+              if(auth()->user()->projectmanager()->count() > 1){
+
+                $this->validate($request,[
+                    'project_id'=>['numeric','required','exists:projects,id']
+                ]);
+        
+                $data = auth()->user()->projectmanager->where('id',$request->project_id)->first();
+        
+             
+            }else{
+                $data = auth()->user()->projectmanager()->first();
+               
+            }
+                
+                $data =  $data->with(['purchase_order'=>function($q){
             
             
                         return $q->where('status',1);
@@ -174,14 +267,13 @@ class projectManagerController extends Controller
                                 return $q->where('status',1);
             
             
-                            }])->withsum('subcontractor','total')->with(['contract'=>function($q){
+                            }])->withsum('subcontractor','total')->with(['contract'=>function($q)use($project){
             
-                                   $q->with(['user'=>function($query){
+                                   $q->with(['user'=>function($query)use($project){
             
-                                      $query->with(['Attending_and_leaving'=>function($qe) {
-                           
-                                        
-                                                 }])->withsum('Attending_and_leaving','time_difference')->withsum('Attending_and_leaving','min');
+                                      $query->withsum(['timesheet_project_personal as time'=>function($q)use($project){
+                                        return $query->where('project_id',$project);
+                                      }]);
             
         
                                                  $query = $query->withCount(['Attending_and_leaving as Absence'=> function ($query) {
@@ -201,15 +293,16 @@ class projectManagerController extends Controller
             
                 
            return response()->json(['data'=>$data]);
-            }
+            
                
             
         }
         
         public function costcenter( ){
         
+          $projects = auth()->user()->projectmanager()->select(['id','projectmanager_id','name'])->get();
             
-        return view('ProjectManager.costcenter');
+        return view('ProjectManager.costcenter')->with('projects',$projects);
         
            
         
@@ -222,13 +315,36 @@ class projectManagerController extends Controller
 
         public function jsontimesheet(request $request)
         {
-          $data = User::query();
-       
-$data = $data->WhereHas('contract',function($q){
 
-$q->WhereHas('project',function($query){
+          
+     
 
-  return $query->where('id',auth()->user()->projectmanager->id);
+          if(auth()->user()->projectmanager()->count() > 1){
+
+            $this->validate($request,[
+                'project_id'=>['numeric','required','exists:projects,id']
+            ]);
+    
+            $project = auth()->user()->projectmanager->where('id',$request->project_id)->first();
+    
+         
+        }else{
+
+            $project = auth()->user()->projectmanager()->first();
+           
+        }
+
+      
+
+$data = $data = User::query();
+
+
+        
+$data = $data->WhereHas('contract',function($q)use($project){
+
+$q->WhereHas('project',function($query)use($project){
+
+  return $query->where('id',$project->id);
 
 });
 
@@ -244,45 +360,38 @@ $q->WhereHas('project',function($query){
           }])->with('role')
           
         
-          ->withSum(
-            ['Attending_and_leaving' => function($q) use($request){
+    
+      
+        
+
+      ->withSum(
+            ['timesheet_project_personal' => function($q) use($request,$project){
+      
+      
+              if($project->id){
+                $q->where('project_id',$project->id);
+              }
+      
       
               if($request->from){
       
-                $q->whereDate('attending_time','>=',$request->from);
+                $q->whereMonth('date','>=',$request->from);
                  }
+      
+                 if($request->from){
+                  $q->whereMonth('date','>=',$request->to);
+                   }
          
-                 if($request->to){
-         
-                    $q->whereDate('attending_time','<=',$request->to);
-                     }
-         
+      
+      
+           
                   return $q;   
                   
       
           }],
-          'time_difference'
+          'time'
         )
       
-        ->withSum(
-          ['Attending_and_leaving' => function($q) use($request){
-      
-            if($request->from){
-      
-              $q->whereDate('attending_time','>=',$request->from);
-               }
-       
-               if($request->to){
-       
-                  $q->whereDate('attending_time','<=',$request->to);
-                   }
-       
-                return $q;   
-                
-      
-        }],
-        'min'
-      )
       ;
           $data = $data->withCount(['Attending_and_leaving as Absence'=> function ($query) {
             return $query->where('absence','!=',null);
@@ -295,9 +404,217 @@ $q->WhereHas('project',function($query){
 
         
         public function timesheet(){
-          return view('ProjectManager.timesheet');
+          $projects = auth()->user()->projectmanager()->select(['id','projectmanager_id','name'])->get();
+            
+          return view('ProjectManager.timesheet')->with('projects',$projects);
         }
           
+
+        public function projectstimesheetPage(){
+          $projects = auth()->user()->projectmanager()->select(['id','projectmanager_id','name'])->get();
+            
+       
+          return view('ProjectManager.summary')->with('projects',$projects);
+      }
+      
+
+        public function jsonprojectReport(request $request)
+{
+    $this->validate($request,[
+        'project_id'=>['required','numeric','exists:projects,id'],
+    ]);
+/*
+    $users = project::get();
+   
+    $scaling = [];
+    $number = 10;
+    foreach($users as $user){
+        
+        for ($i=0; $i <=12 ; $i++) { 
+
+
+      # We calculate the number of vacation days during the month 
+
+      $start = new DateTime(Carbon::now()->subMonths($i)->startOfMonth());
+      $end = new DateTime(Carbon::now()->subMonths($i)->lastOfMonth());
+      
+      $interval = new DateInterval('P1D');
+      $daterange = new DatePeriod($start, $interval ,$end);
+      
+      $weekends = 0;
+      foreach($daterange as $date){
+          $days = $date->format('D');
+          if ($days == 'Fri') { # we set friday
+              $weekends++;
+          }
+      }
+
+      # here we calculate the difference between the start of month and now
+    $st1 = Carbon::now()->subMonths($i)->startOfMonth();
+    $st2 = Carbon::now()->subMonths($i)->lastOfMonth();
+
+
+      $diff = $st2->diffInDays(Carbon::parse($st1));
+
+#then we calculate wokring days 
+
+$working_days = ($diff - $weekends  );
+
+
+$number = 10; # this test  number of workers 
+
+
+$numbers_util_now = $number  * $working_days * 10; # total  attendance * working days 
+$rand = rand(100,120) * 10;
+$increment = ( $rand * 100 /  $numbers_util_now ); # actual attendance * total  attendance / 100 
+
+$points = ($increment * rand(7,9));
+
+*/
+
+
+
+/*
+           $scaling[] = [
+            
+                'date'=>$st1->format('Y-m-d'),
+                'percentage_performance'=>0,
+                'cash_out'=>0,
+                'percentage_attendance'=>($increment ),
+                'cash_in'=>0,
+                'num_of_performers'=>0,
+                'num_of_attendance'=>$rand ,
+                'performance_point'=>0,
+                'time_attendance'=>$time,
+                'project_id'=>$user->id
+            
+           ];
+ }
+     }
+*/
+       
+
+  
+
+
+  
+$data = project::query();
+if($request->project_id){
+    $data = $data->where('id',$request->project_id);
+}
+
+$data = $data->whereHas('project_overall',function($q)use($request){
+ 
+  
+
+
+});
+$data = $data->with(['project_overall'=>function($q)use($request){
+
+  $from = date('m', strtotime($request->from));
+  $to = date('m', strtotime($request->to));
+ 
+  if($from){
+      $q->whereMonth('date','>=',$from);
+  }
+
+  if($to){
+    $q->whereMonth('date','<=',$to);
+}
+
+return $q;
+
+}]);
+
+$data =   $data->first();
+
+  return response()->json(['data'=>$data]);
+}
+//----------------------- manule attendance -----------------------------------
+
+public function manule_attendance(){
+  $projects = auth()->user()->projectmanager()->select(['id','projectmanager_id','name'])->get();
+            
+       
+  return view('ProjectManager.attendance')->with(['projects'=>$projects]);
+}
+
+public function attendance_absence_manule(request $request){
+
+  $this->validate($request,[
+    'from'=>['required'],
+    'type'=>['required','numeric','digits_between:1,2'],
+    'project_id'=>['required','numeric']
+  ]);
+  
+  if($request->type== 1){
+    $this->validate($request,[
+      'to'=>['required'],
+    ]);
+  }
+  
+  
+    $data = json_decode($request->data, true);
+  
+    $startTime = Carbon::createFromFormat('Y-m-d H:i:s',$request->from);
+  
+    $endTime = Carbon::createFromFormat('Y-m-d H:i:s',$request->to);
+  
+    $totalDuration =  $startTime->diffInHours($endTime);
+  
+    $totalMin =  $startTime->diffInMinutes($endTime)  - 60 * $totalDuration;
+  
+  
+  if($totalMin >= 55){
+  $totalDuration += 1;
+  $totalMin = 0;
+  }else{
+    $totalDuration += $totalMin / 100;
+  }
+  
+  
+  $attendance = [];
+  
+    foreach($data as $da){
+      
+      $attendance[] = [
+  'user_id'=>$da['id'],
+  'attending_time'=> $request->type == 1 ? $request->from : null,
+  'attending_leaving'=> $request->type == 1 ? $request->to : null,
+  'absence' => $request->type == 2 ? Carbon::parse($request->from)->format('d/m/Y') : null   ,
+  'time_difference'=> $request->type == 1 ? $totalDuration : null,
+
+  'project_id'=>$request['project_id']
+      ];
+
+      
+    }
+  
+  
+    $array_chunk = array_chunk($attendance,100);
+
+
+    foreach($array_chunk as $chunk){
+      Attending_and_leaving::insert($chunk);
+    
+    }
+
+   
+  foreach($attendance as $chunk){
+  
+    $job = (new hearing_process_attendance($attendance))->delay(Carbon::now()->addSeconds(90));
+
+    $this->dispatch($job);
+
+  }
+   
+  
+  
+  }
+  
+
+
+
       }
       
     

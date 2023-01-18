@@ -85,7 +85,7 @@ class petty_cashController extends Controller
 
     
             $petty_cash_cycle =  $petty_cash->petty_cash_cycle()->orderBy('id', 'DESC')->first();
-           
+           if($petty_cash_cycle){
             $petty_cash_cycle->update(['status'=>0]);
 
            
@@ -94,7 +94,7 @@ class petty_cashController extends Controller
             ->first();
         
           
-        
+           
              //
 
                  
@@ -117,7 +117,40 @@ foreach( $perv->role->user as $flow){
    $this->dispatch($job);
    NotificationEvent::dispatch($user->id,$content);
  }
-       
+           } else{
+               $workflow = workflow::where('name','petty_cash')->first()->flowworkStep()
+->first();
+
+
+foreach( $workflow->role->user as $flow){
+
+    notification::create([
+
+        'type'=>3,
+        'read'=>1,
+        'name'=>'New petty cash Request',
+      'user_id_to'=>$flow->id,
+         'user_id_from'=>auth()->user()->id,
+         
+    ]);
+    $user = $flow;
+    $content = 'New petty cash Request';
+    $managercontent = '';
+    $job = (new rolecc($user,$content,$managercontent))->delay(Carbon::now()->addSeconds(90));
+   $this->dispatch($job);
+ //  NotificationEvent::dispatch($user->id,$content);
+   
+ }
+
+petty_cash_cycle::insert([
+ 'step'=>1,
+ 'status'=>0,
+ 'flowwork_step_id'=>$workflow->id,
+ 'role_id'=>$workflow->role_id,
+ 'petty_cash_id'=>$petty_cash->id
+]);
+
+           }   
          if($request->count > 0){
             for($counter = 0;  $counter <= $request->count;  $counter++){
              
@@ -265,7 +298,7 @@ foreach( $perv->role->user as $flow){
             'status'=>0,
     
             'expected_amount'=>($request->total + $request->vat),
-            'cost_center_id'=>$request->cost_center_id,
+           
           'vat'=>$request->vat,
             'ref'=>$request->ref,
            'date'=>$request->date,

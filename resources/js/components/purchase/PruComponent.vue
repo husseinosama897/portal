@@ -637,6 +637,27 @@
          </div>
       </div>
   
+      
+
+      <div class="modal fade bd-example-modal-lg"  id="LowBudgetModal" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true" style="overflow-y: auto;"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content"  
+      
+   >
+
+   <img src="/img/2086.jpg" class="img-fluid" alt="Responsive image">
+ 
+   <div class="alert alert-danger" role="alert">
+                  <h4 class="alert-heading">  the current budget less than your order </h4>
+         
+               
+                  <hr>
+                  <input type="button" class="btn btn-dark" data-dismiss="modal" value="close">
+               </div>
+    </div>
+  </div>
+</div>
 
       <div class="modal fade bd-example-modal-lg"  id="deathEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true" style="overflow-y: auto;"
 >
@@ -1285,6 +1306,18 @@ sum = (Number(15) * Number(this.after_discount) / Number(100)) ?? 0
       return overall
    }
        },
+
+
+       watch:{
+         'totalpo_expenses':function(){
+            if(this.totalpo_expenses  >= this.projectselected.po_budget){
+
+               window.$("#LowBudgetModal").modal("show"); 
+      
+
+            }
+         }
+       }
 
      
    }

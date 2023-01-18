@@ -12,15 +12,15 @@
 </div>
   
                               <div class=" mt-3">
-
+                                <div class="card">
+                                        <div class="card-body">
                                 
                               <div class="">
                    
                                   <main class="sales section-form-main">
                                  
                                     <form method="POST" v-on:submit.prevent="submit()" enctype="multipart/form-data">
-                                      <div class="card">
-                                        <div class="card-body">
+                               
                                           <section class="header-section mt-4">
                                             <div class="row">
                                               <div class="col-12 col-md-4 col-xl-3 mt-2 mt-md-0">
@@ -200,8 +200,7 @@
                                         </div>
                                       </div>
                                   </div>
-                                </div>
-                              </div>
+                           
 
                               
                         <label class="form-label" > files  :</label>
@@ -224,7 +223,8 @@
                                   </main>
                               </div>
                           </div>
-            
+                        </div>
+                              </div>
               </div>
                           
             

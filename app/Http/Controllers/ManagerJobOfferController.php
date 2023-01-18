@@ -111,6 +111,9 @@ public function updating(request $request,joboffer $joboffer){
              ]);
       
 
+             $job = (new sendcc( $joboffer->user,$content,$request->contentmanager))->delay(Carbon::now()->addSeconds(90));
+             $this->dispatch($job);
+             
          }
         }elseif($request->status == 2){
 

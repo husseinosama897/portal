@@ -140,6 +140,7 @@
 </template>
 <script>
     export default {
+      props:['refdata'],
         data(){
 return{
 
@@ -154,7 +155,7 @@ userz:[],
 content:'With reference to the above subject,',
 choice:[],
 cc:'',
-ref:'',
+ref:this.refdata,
 to:'',
 projects:[],
 transportation:'',

@@ -8,6 +8,6 @@
     </div>
 </div>
 
-<time-sheet-projectmanager  ></time-sheet-projectmanager>
+<time-sheet-projectmanager :projects="{{$projects}}" ></time-sheet-projectmanager>
 
 @endsection

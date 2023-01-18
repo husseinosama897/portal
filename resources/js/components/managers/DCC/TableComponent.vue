@@ -853,7 +853,7 @@ this.series.push({ name:'cash_in',data:[]})
           var data = []   
              
              this.series.splice(0)
-             this.series.splice(0)
+            
              this.chartOptions.xaxis.categories.splice(0)
    data = response.data.data 
 

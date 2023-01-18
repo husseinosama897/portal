@@ -153,7 +153,7 @@
                   <div class="card">
                      <div class="card-header">
                         <h4 class="card-title">salary package : </h4>
-                        <input class="form-control" v-model="salary2" >
+                        <input class="form-control" v-model="salary" >
                      </div>
                   </div>
                </div>
@@ -250,6 +250,27 @@
             </div>
             
                     </form>
+
+                    <div class="modal fade bd-example-modal-lg"  id="deathEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true" style="overflow-y: auto;"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content"  
+      
+   >
+
+   <img src="/img/18915851.jpg" class="img-fluid" alt="Responsive image">
+ 
+   <div class="alert alert-danger" role="alert">
+                  <h4 class="alert-heading"> فشلت العمليه  !</h4>
+                  <p>    :  لقد فشلت العمليه للاسباب التاليه </p>
+                  <p v-for="(err,index)  in allerros" :key="index"> {{err}}</p>
+                  <hr>
+                  <input type="button" class="btn btn-dark" data-dismiss="modal" value="الغاء">
+               </div>
+    </div>
+  </div>
+</div>
+
                     </div>
                     </template>
                     <script>
@@ -281,15 +302,16 @@ benefits:[
 
 ],
 ref:this.refdata,
+salary:'',
 email:'',
 subject:'',
 name:'',
 date:'',
+allerros:[],
 benefit_check:false,
 work_location:'',
 contract_type:'',
 content:'On behalf of Advanced Construction Power CO. I am pleased to offer you I am pleased to offer you the position of  XXXXX  in our Construction Dept. with the following terms and conditions',
-salary:'',
 images:[],
 }
                     },
@@ -337,23 +359,24 @@ this.salary= ''
 
 
                       submit2(){
-   
+       
    const  data = {ref:this.ref, 
 date:this.date,
-work_place:this.work_place,
+work_location:this.work_location,
 contract_type: this.contract_type,
 content:this.content,
-salary:this.salary,
+salary:this.salary2,
 subject: this.subject,
 condition:this.conditions,
+name:this.name,
 benefits:this.benefits
      }
    
    this.$cookies.set('joboffer',data);
    
-   
+  
    window.location.href = ('/joboffer/preview2')
-   
+    
    },
 
                       submit(){
@@ -436,7 +459,22 @@ axios.post('/joboffer/insert',formData, {
 .then(res=>{
   this.$cookies.remove('joboffer');
   window.location.href = ('/joboffer/index') 
-})
+}).catch(error=>{
+   if (error.response.status == 422){
+    if(Array.isArray(error.response.data.errors)){
+        this.allerros = error.response.data.errors;
+    }else{
+        try {
+   this.allerros = JSON.parse(error.response.data.message);
+        }
+        catch{
+               this.allerros = error.response.data.errors;
+        }
+    }
+   window.$("#deathEmployeeModal").modal("show"); 
+      
+     }
+   })
 
                       },
 
@@ -471,7 +509,7 @@ axios.post('/joboffer/insert',formData, {
 
     this.ref = data.ref ?? '', 
 this.date = data.date ?? '',
-this.work_place = data.work_place ?? '',
+this.work_location = data.work_location ?? '',
 this.contract_type = data.contract_type ?? '',
 this.content  = data.content ?? '',
 this.salary = data.salary ?? '',
@@ -484,15 +522,17 @@ this.subject = data.subject ?? ''
 
 
   computed:{
-salary2(){
+ salary2: function(){
   var  value = 0
   this.benefits.forEach(e=>{
 
-value = (Number(e.value) + Number(value))
+value = (Number(e.value ?? 0) + Number(value))
+value = (Number(this.salary) + Number(value))
+
 
   })
 
-  value = (Number(value) + Number(this.salary))
+
   return value
 }
 

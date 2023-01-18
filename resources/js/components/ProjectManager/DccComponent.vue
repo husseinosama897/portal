@@ -2,6 +2,23 @@
 <div>
 
 
+  <div class="card">
+
+<div class="card-body">
+<div class="row">
+<div class="col-4">
+
+<select  v-model="project_id" class="form-control">
+  <option  ></option>
+  <option  v-for="project in projects" :value="project.id" :key="project.id" >{{project.name}}</option>
+</select>
+</div>
+</div>
+</div>
+
+</div>
+
+
   <div class="row mt-3">
          
     <div class="card">
@@ -395,7 +412,7 @@
 import moment from 'moment'
 
     export default {
-   props:['purchase_orderworkflow','petty_cashworkflow','subcontrctorworkflow','matrial_requestworkflow'],
+   props:['purchase_orderworkflow','projects','petty_cashworkflow','subcontrctorworkflow','matrial_requestworkflow'],
    data(){
 return{
   purchase_order_real_cycle: [
@@ -405,6 +422,8 @@ return{
       petty_cash_real_cycle: [
          
          ],
+
+project_id:'',
 
          matrial_request_real_cycle: [
          
@@ -508,14 +527,11 @@ pos:{},
 matrial_request:[],
 subcontractor:{},
 employee:[],
-delivery_from:'',
-delivery_to:'',
+
 date:'',
 
 ref:'',
-fakedata:{
- fakedata: []
-  },
+
 today:'',
 }
 
@@ -631,7 +647,14 @@ today:'',
 		axios({
   method: 'post',
   url: '/project_manager/DCC/jsondcmatrial_request?page=' + page,
+  data:{
+ 
+date:this.date,
 
+project_id:this.project_id,
+
+
+}
 })		.then(response => {
                     
               this.matrial_request =  response.data.matrial_request
@@ -643,7 +666,14 @@ today:'',
 		axios({
   method: 'post',
   url: '/project_manager/DCC/jsondcmatrial_request' ,
-
+  data:{
+ 
+ date:this.date,
+ 
+ project_id:this.project_id,
+ 
+ 
+ }
 })		.then(response => {
                     
               this.matrial_request =  response.data.matrial_request
@@ -656,7 +686,14 @@ today:'',
 		axios({
   method: 'post',
   url: '/project_manager/DCC/jsondcsubcontractor?page=' + page,
+  data:{
+ 
+date:this.date,
 
+project_id:this.project_id,
+
+
+}
 })		.then(response => {
                     
               this.subcontractor =  response.data.subcontractor
@@ -668,7 +705,14 @@ today:'',
 		axios({
   method: 'post',
   url: '/project_manager/DCC/jsondcsubcontractor' ,
-
+  data:{
+ 
+ date:this.date,
+ 
+ project_id:this.project_id,
+ 
+ 
+ }
 })		.then(response => {
                     
               this.subcontractor =  response.data.subcontractor
@@ -681,7 +725,14 @@ today:'',
 		axios({
   method: 'post',
   url: '/project_manager/DCC/jsondcpetty_cash?page=' + page,
- 
+  data:{
+  
+date:this.date,
+
+project_id:this.project_id,
+
+
+}
 })		.then(response => {
                     
               this.petty_cash =  response.data.petty_cash
@@ -748,7 +799,11 @@ this.series.push({ name:'cash_in',data:[]})
 		axios({
   method: 'post',
   url: '/project_manager/DCC/summary' ,
+  data:{
 
+project_id:this.project_id,
+
+}
 
 })		.then(response => {
   var date = new Date();
@@ -769,6 +824,14 @@ this.series.push({ name:'cash_in',data:[]})
   method: 'post',
   url: '/project_manager/DCC/jsondcpetty_cash' ,
 
+  data:{
+  ref:this.ref,
+date:this.date,
+delivery_date:this.delivery_date, 
+project_id:this.project_id,
+user_id:this.user_id,
+
+}
 
 })		.then(response => {
                     
@@ -909,6 +972,15 @@ sum = (Number(15) * Number(this.edittotalvat.total) / Number(100)) ?? 0
    
 
 
+       },
+       watch:{
+        'project_id':function(){
+          this.posjson()
+     this.petty_cashjson()
+     this.subcontractorjson()
+     this.matrial_requestjson()
+this.dcsummary()
+        }
        }
 
     }

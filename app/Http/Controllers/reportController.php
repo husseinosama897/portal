@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\project;
 use App\User;
+use Carbon\Carbon;
+use DatePeriod;
+use DateInterval;
+use DateTime;
+use App\project_overall;
 class reportController extends Controller
 {
     public function stockPage(){
@@ -18,7 +23,7 @@ class reportController extends Controller
     public function analysis_HR_JSON(request $request){
 
 
-
+/*
         $date = \Carbon\Carbon::now();
 
  $salary =  \App\contract::where('salary_per_month',null)->get();
@@ -55,8 +60,7 @@ $data[]= [
          );
      
    }
-
-
+*/
 
 /*
         foreach(User::get() as $user){
@@ -87,90 +91,73 @@ $data[]= [
         }
 
         \App\Attending_and_leaving::insert($scaling);
-*/
 
+*/
        /*
-$users = User::get();
+$users =   \App\contract::where('country',null)->get();
 $scaling = [];
 foreach($users as $user){
     $randomcountry = rand(1,6);
-    if(empty($user->contract)){
+
         
 
         if($randomcountry == 1){
 
-            $scaling [] = [
-                'user_id'=>$user->id,
-                'country'=>'netherland',
-                'salary_per_month'=>rand(1000,5000)
-            ];
+       $user->update([
+        'country'=>'netherland',
+       ]);
         }
 
         if($randomcountry == 2){
-
-            $scaling [] = [
-                'user_id'=>$user->id,
+            $user->update([
                 'country'=>'egypt',
-                'salary_per_month'=>rand(1000,5000)
-            ];
+               ]);
+        
         }
 
         if($randomcountry == 3){
 
-            $scaling [] = [
-                'user_id'=>$user->id,
+     
+            $user->update([
                 'country'=>'ksa',
-                'salary_per_month'=>rand(1000,5000)
-            ];
+               ]);
+
         }
 
         
         if($randomcountry == 4){
 
-            $scaling [] = [
-                'user_id'=>$user->id,
+            $user->update([
                 'country'=>'india',
-'salary_per_month'=>rand(1000,5000)
-            ];
+               ]);
+
         }
 
         if($randomcountry == 5){
 
-            $scaling [] = [
-                'user_id'=>$user->id,
+            $user->update([
                 'country'=>'serbia',
-                'salary_per_month'=>rand(1000,5000)
-            ];
+               ]);
+
         }
 
         if($randomcountry == 6){
 
-            $scaling [] = [
-                'user_id'=>$user->id,
+        
+            $user->update([
                 'country'=>'iraq',
-                'salary_per_month'=>rand(1000,5000)
-            ];
+               ]);
+
         }
 
     }
-}
-
-
-$chunkdata = array_chunk($scaling,10);
-
-
-foreach($chunkdata as $chunk){
-
-    \App\contract::insert($chunk);
-}
 */
+
+
 
 /*
  $data =      \App\contract::where('age',null)->get();
        
-
-      
-
 foreach($data as $dat){
     $randage = rand(20,60);
   $newDateTime = \Carbon\Carbon::today()->subYears($randage);
@@ -180,8 +167,8 @@ foreach($data as $dat){
     ]);
 
 }
-*/
 
+*/
         $data = User::query();
 
       $data =  $data->withsum('Attending_and_leaving','time_difference')->withsum('Attending_and_leaving','min');
@@ -258,6 +245,187 @@ return $q->where('product_id','=',null);
     }
 
 
+}
+
+public function positiontimesheetPage(){
+    return view('managers.report.timesheet.position');
+}
+
+public function projectstimesheetPage(){
+    return view('managers.report.timesheet.project');
+}
+
+
+//----------------------- * * * Performance project report * * * ---------------------------------------------
+
+
+public function project_search(request $request){
+
+    $this->validate($request,[
+        'project_name'=>['required','string','max:255'],
+    ]);
+    $data = project::query();
+
+    if($request->project_name){
+
+    $data =   $data->where('name', 'LIKE', '%' . $request->project_name . '%');
+      
+            }
+
+            $data = $data->select(['id','name'])->get()->take(5);
+
+            return response()->json(['data'=>$data]);
+}
+
+
+//-----------------------------------------------------------------
+public function jsonprojectReport(request $request)
+{
+    $this->validate($request,[
+        'project_id'=>['required','numeric','exists:prjects,id'],
+    ]);
+/*
+    $users = project::get();
+   
+    $scaling = [];
+    $number = 10;
+    foreach($users as $user){
+        
+        for ($i=0; $i <=12 ; $i++) { 
+
+
+      # We calculate the number of vacation days during the month 
+
+      $start = new DateTime(Carbon::now()->subMonths($i)->startOfMonth());
+      $end = new DateTime(Carbon::now()->subMonths($i)->lastOfMonth());
+      
+      $interval = new DateInterval('P1D');
+      $daterange = new DatePeriod($start, $interval ,$end);
+      
+      $weekends = 0;
+      foreach($daterange as $date){
+          $days = $date->format('D');
+          if ($days == 'Fri') { # we set friday
+              $weekends++;
+          }
+      }
+
+      # here we calculate the difference between the start of month and now
+    $st1 = Carbon::now()->subMonths($i)->startOfMonth();
+    $st2 = Carbon::now()->subMonths($i)->lastOfMonth();
+
+
+      $diff = $st2->diffInDays(Carbon::parse($st1));
+
+#then we calculate wokring days 
+
+$working_days = ($diff - $weekends  );
+
+
+$number = 10; # this test  number of workers 
+
+
+$numbers_util_now = $number  * $working_days * 10; # total  attendance * working days 
+$rand = rand(100,120) * 10;
+$increment = ( $rand * 100 /  $numbers_util_now ); # actual attendance * total  attendance / 100 
+
+$points = ($increment * rand(7,9));
+
+*/
+
+
+
+/*
+           $scaling[] = [
+            
+                'date'=>$st1->format('Y-m-d'),
+                'percentage_performance'=>0,
+                'cash_out'=>0,
+                'percentage_attendance'=>($increment ),
+                'cash_in'=>0,
+                'num_of_performers'=>0,
+                'num_of_attendance'=>$rand ,
+                'performance_point'=>0,
+                'time_attendance'=>$time,
+                'project_id'=>$user->id
+            
+           ];
+ }
+     }
+*/
+       
+
+  
+
+
+  
+$data = project::query();
+if($request->project_id){
+    $data = $data->where('id',$request->project_id);
+}
+
+
+
+$data = $data->whereHas('project_overall',function($q)use($request){
+    if($request->from){
+        $q->whereMonth('date','>=',$request->from);
+    }
+
+
+    if($request->to){
+        $q->whereMonth('date','=<',$request->to);
+    }
+
+
+});
+$data = $data->with('project_overall');
+
+$data =   $data->first();
+
+  return response()->json(['data'=>$data]);
+}
+
+
+
+public function jsonpositionReport(request $request)
+{
+  $data = User::query();
+
+  $data = $data->select(['id','role_id','name','laborer']);
+
+  $data = $data->WhereHas('contract',function($q){
+
+
+    });
+
+  $data = $data->with(['contract'=>function($q){
+
+  }])->with('role');
+  
+
+ $data=  $data->withSum(
+    ['timesheet_monthly_personal' => function($q) use($request){
+
+
+
+ 
+          return $q;   
+          
+
+  }],
+  'time'
+)
+
+;
+      $data = $data->withCount(['Attending_and_leaving as Absence'=> function ($query) {
+    return $query->where('absence','!=',null);
+   }]);
+  
+
+
+$data =   $data->get();
+
+  return response()->json(['data'=>$data]);
 }
 
 }

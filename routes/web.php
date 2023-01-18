@@ -26,6 +26,8 @@ Route::group(['prefix'=>'profile'],function(){
 Route::get('/timesheet','MyProfileController@mytimesheet')->name('mytimesheet');
 Route::post('/jsontimesheet','MyProfileController@jsontimesheet');
 
+Route::get('/','MyProfileController@profile')->name('my.profile');
+
 
 });
 
@@ -174,7 +176,23 @@ Route::get('qr/{num}','qrController@find')->name('find.qr');
 
 Route::get('/', function () {
 
+    /*
+    $start = new DateTime('2022-12-1');
+    $end = new DateTime('2022-12-20');
     
+    $interval = new DateInterval('P1D');
+    $daterange = new DatePeriod($start, $interval ,$end);
+    
+    $saturdays = 0;
+    foreach($daterange as $date){
+        $days = $date->format('D');
+        if ($days == 'Fri') {
+            $saturdays++;
+        }
+    }
+    
+    echo $saturdays;
+    */
 
     return view('welcome');
 })->name('start');
@@ -188,6 +206,28 @@ Auth::routes();
 
 // -----------------------  project manager * * * -----------------------------------
 Route::group(['prefix'=>'project_manager'],function(){
+
+
+    
+
+    Route::group(['prefix'=>'attendance'],function(){
+
+        Route::post('/post', 'projectManagerController@attendance_absence_manule')->name('projectmanager.attendance_absence_manule');
+
+        Route::get('/', 'projectManagerController@manule_attendance')->name('projectmanager.attendance_absence_manule');
+
+    });
+
+
+    Route::group(['prefix'=>'report'],function(){
+        Route::get('/summary', 'projectManagerController@projectstimesheetPage')->name('projectmanager.projectstimesheetPage');
+
+        Route::post('/jsonprojectReport', 'projectManagerController@jsonprojectReport')->name('projectmanager.jsonprojectReport');
+
+
+        
+    });
+    
 
 
     Route::group(['prefix'=>'timesheet'],function(){
@@ -700,12 +740,44 @@ Route::post('/projectJson/{project}', 'projectController@projectJson')->name('pr
 Route::post('/stockJson/{project}', 'reportController@stock')->name('stockJson');
 
 
+
+Route::post('/project_search', 'reportController@project_search')->name('project_search');
+
+
+
+
 Route::get('/stockpage', 'reportController@stockpage')->name('stockpage');
 
 Route::get('/analysis_HR_JSON', 'reportController@analysis_HR_JSON')->name('analysis_HR_JSON');
 
 
 Route::get('/analysis_HR_page', 'reportController@analysis_HR_page')->name('analysis_HR_page');
+
+
+Route::get('/position', 'reportController@positiontimesheetPage')->name('positiontimesheetPage');
+
+
+Route::post('/jsonpositionReport', 'reportController@jsonpositionReport')->name('stockJson');
+
+
+
+
+Route::group(['prefix'=>'project'] ,  function(){
+    Route::get('/', 'reportController@projectstimesheetPage')->name('projectstimesheetPage');
+
+   
+Route::post('/jsonprojectReport', 'reportController@jsonprojectReport')->name('projectJson');
+    
+ 
+
+}
+
+);
+
+
+
+
+
 
 
 });
