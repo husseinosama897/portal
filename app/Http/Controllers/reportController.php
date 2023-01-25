@@ -10,6 +10,9 @@ use DatePeriod;
 use DateInterval;
 use DateTime;
 use App\project_overall;
+use App\summaryreoprt;
+use App\section;
+
 class reportController extends Controller
 {
     public function stockPage(){
@@ -282,7 +285,7 @@ public function project_search(request $request){
 public function jsonprojectReport(request $request)
 {
     $this->validate($request,[
-        'project_id'=>['required','numeric','exists:prjects,id'],
+        'project_id'=>['required','numeric','exists:projects,id'],
     ]);
 /*
     $users = project::get();
@@ -367,14 +370,28 @@ if($request->project_id){
 
 
 $data = $data->whereHas('project_overall',function($q)use($request){
-    if($request->from){
-        $q->whereMonth('date','>=',$request->from);
-    }
-
+    $from ='';
+    $to ='';
+  if($request->from){
+    $from = date('m', strtotime($request->from));
+  }
 
     if($request->to){
-        $q->whereMonth('date','=<',$request->to);
-    }
+        $to = date('m', strtotime($request->to));
+      }
+       
+      
+        if($from){
+            $q->whereMonth('date','>=',$from);
+        }
+      
+        if($to){
+          $q->whereMonth('date','<=',$to);
+      }
+      
+   
+            return $q;   
+        
 
 
 });
@@ -404,13 +421,31 @@ public function jsonpositionReport(request $request)
   
 
  $data=  $data->withSum(
-    ['timesheet_monthly_personal' => function($q) use($request){
+    ['personal_overall' => function($q) use($request){
 
 
+        $from ='';
+        $to ='';
+      if($request->from){
+        $from = date('m', strtotime($request->from));
+      }
 
- 
-          return $q;   
+        if($request->to){
+            $to = date('m', strtotime($request->to));
+          }
+           
           
+            if($from){
+                $q->whereMonth('date','>=',$from);
+            }
+          
+            if($to){
+              $q->whereMonth('date','<=',$to);
+          }
+          
+       
+                return $q;   
+            
 
   }],
   'time'
@@ -425,7 +460,235 @@ public function jsonpositionReport(request $request)
 
 $data =   $data->get();
 
-  return response()->json(['data'=>$data]);
+
+
+if($request->from){
+    $start =  Carbon::createFromFormat('Y-m-d',$request->from)->startOfMonth();
+  
+  }else{
+    $start = new DateTime(Carbon::now()->startOfMonth());
+  
+    
+  }
+  
+  if($request->to){
+    $end =  Carbon::createFromFormat('Y-m-d',$request->to);
+  }else{
+    $end = new DateTime(Carbon::now()->format('Y-m-d'));
+  }
+  
+  $interval = new DateInterval('P1D');
+  $daterange = new DatePeriod($start, $interval ,$end);
+  
+  $weekends = 0;
+  
+  foreach($daterange as $date){
+      $days = $date->format('D');
+      if ($days == 'Fri') { # we set friday
+          $weekends++;
+      }
+  }
+
+
+  return response()->json(['data'=>$data,'weekends'=>$weekends]);
 }
+
+
+// ------------------------------- construction report -------------------------------------------
+
+public function construction(){
+    $bid_value = summaryreoprt::select(['id','bid_value_open'])->first();
+
+
+return view('managers.report.section.construction')->with(['bid_value'=>$bid_value]);
+}
+
+
+public function tenderpage(){
+ 
+return view('managers.report.section.tender');
+}
+
+
+
+public function tenderjson(request $request){
+    $section = section::where('name','tender')->with(['monthly_section'=>function($q)use($request){
+
+        $from ='';
+        $to ='';
+      if($request->from){
+        $from = date('m', strtotime($request->from));
+      }
+
+        if($request->to){
+            $to = date('m', strtotime($request->to));
+          }
+           
+          
+            if($from){
+                $q->whereMonth('date','>=',$from);
+            }
+          
+            if($to){
+              $q->whereMonth('date','<=',$to);
+          }
+          
+       
+                return $q;   
+            
+                
+
+    }])->first();
+
+    return response()->json(['data'=>$section]);
+
+}
+
+public function jsonconstruction(request $request){
+
+/*
+$petty_cashs = \App\subcontractor::where('total','!=',null)->where(['status'=>1])->get();
+$array = [];
+foreach($petty_cashs as $petty_cash){
+
+
+$project_overall = project_overall::whereDate('date',Carbon::createFromFormat('Y-m-d', $petty_cash->date)->firstOfMonth()
+
+)->where(['project_id'=>$petty_cash->project_id])->first();
+
+    if(!$project_overall ){
+    project_overall::create([
+    'date'=>Carbon::createFromFormat('Y-m-d', $petty_cash->date)->firstOfMonth(),
+    'percentage_performance'=>0,
+    'cash_out'=>$petty_cash->total,
+    'percentage_attendance'=>0,
+    'cash_in'=>0,
+    'num_of_performers'=>0,
+    'num_of_attendance'=>0,
+    'performance_point'=>0,
+    'time_attendance'=>0,
+ 
+    'project_id'=>$petty_cash->project_id
+]);
+    }else{
+        $project_overall->increment('cash_out',$petty_cash->total);
+    }
+}
+    
+*/
+
+    $data = project::query();
+
+
+
+
+    $data = $data->select(['id','bid_value','name']);
+
+$data = $data->whereHas('project_overall',function($q)use($request){
+    if($request->from){
+        $q->whereMonth('date','>=',$request->from);
+    }
+
+
+    if($request->to){
+        $q->whereMonth('date','=<',$request->to);
+    }
+
+
+});
+$data = $data->with(['project_overall'=>function($q){
+return $q->select(['date','id','cash_in','cash_out',
+'percentage_performance','percentage_attendance'
+,'project_id']);
+}]);
+
+$data =   $data->get();
+
+
+
+  return response()->json(['data'=>$data]);
+
+
+}
+
+
+public function procurementjson(request $request){
+    $section = section::where('name','procurement')->with(['monthly_section'=>function($q)use($request){
+
+        $from ='';
+        $to ='';
+      if($request->from){
+        $from = date('m', strtotime($request->from));
+      }
+
+        if($request->to){
+            $to = date('m', strtotime($request->to));
+          }
+           
+          
+            if($from){
+                $q->whereMonth('date','>=',$from);
+            }
+          
+            if($to){
+              $q->whereMonth('date','<=',$to);
+          }
+          
+       
+                return $q;   
+            
+                
+
+    }])->first();
+
+    return response()->json(['data'=>$section]);
+
+}
+
+public function procurementpage(){
+return view('managers.report.section.procurement');
+}
+
+
+
+
+
+public function marketingjson(request $request){
+    $section = section::where('name','Marketing')->with(['monthly_section'=>function($q)use($request){
+
+        $from ='';
+        $to ='';
+      if($request->from){
+        $from = date('m', strtotime($request->from));
+      }
+
+        if($request->to){
+            $to = date('m', strtotime($request->to));
+          }
+           
+          
+            if($from){
+                $q->whereMonth('date','>=',$from);
+            }
+          
+            if($to){
+              $q->whereMonth('date','<=',$to);
+          }
+          
+       
+                return $q;   
+            
+                
+
+    }])->first();
+
+    return response()->json(['data'=>$section]);
+
+}
+
+public function marketingpage(){
+return view('managers.report.section.marketing');
+}
+
 
 }

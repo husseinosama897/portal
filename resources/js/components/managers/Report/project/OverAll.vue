@@ -91,7 +91,7 @@ var overall = 0
  var percentage_performance =  (Number(e.percentage_performance) * 0.25 )
 var sum = (Number(e.cash_in) - Number(e.cash_out)) 
 
-sum = (Number(sum) * 100 / e.cash_in) 
+sum = (Number(sum) * 100 / e.cash_in)  
 
 
 var comparison = 0
@@ -105,7 +105,7 @@ if(sum > 20){
 }
 
 if( sum <= 0 ){
-   comparison =   sum
+   comparison =   0
 
 }
 
@@ -133,8 +133,8 @@ actual = (Number(total) + Number(actual))
 
               this.output = this.output.toFixed(2)
              var exponent = (1 / this.series[0].data.length)
-
-             var st = this.series[0].data[0] / this.series[0].data[this.series[0].data.length - 1]
+             
+             var st = (Number(this.series[0].data[this.series[0].data.length - 1]) / Number(this.series[0].data[0]  > 0 ? this.series[0].data[0] : 0.01  )   )
 
          this.growth_rate =     Math.pow(st,exponent) - 1 
 

@@ -10,7 +10,7 @@
 </div>
 
 
-<role-create-component  :permission="{{$data}}"><role-create-component>
+<role-create-component  :section="{{$section}}" :permission="{{$data}}"><role-create-component>
 
 
 @endsection

@@ -195,6 +195,23 @@
                      
 
 
+                                  
+                     <div class=" mb-2">
+                        <label class="col-sm" > picture  :</label>
+                        <div class="col-sm">
+                           <input type="file"   v-on:change="onpictureChange($event)" >
+                        </div>
+                     </div>
+
+
+                     <div class=" mb-2">
+                        <label class="col-sm" > files  :</label>
+                        <div class="col-sm">
+                           <input type="file"   v-on:change="onfilesChange($event)"  multiple>
+                        </div>
+                     </div>
+
+
                      <div class=" row mb-0">
                         <div class="col-md-6 offset-md-4">
                            <button type="submit" class="btn btn-primary">
@@ -222,19 +239,28 @@
             </div>
          </div>
       </div>
-      <div id="deathEmployeeModal" class="modal fade bd-example" style="overflow:auto;">
-         <div class="modal-dialog ">
-            <div class="modal-content" style="overflow:auto;">
-               <div class="alert alert-danger" role="alert">
-                  <h4 class="alert-heading"> فشلت العمليه  !</h4>
-                  <p>    :  لقد فشلت العمليه للاسباب التاليه </p>
-                  <p v-for="(err,index)  in allerros" :key="index"> {{err}}</p>
-                  <hr>
-                  <input type="button" class="btn btn-dark" data-dismiss="modal" value="الغاء">
-               </div>
-            </div>
-         </div>
-      </div>
+  
+      
+     <div class="modal fade bd-example-modal-lg"  id="deathEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true" style="overflow-y: auto;"
+>
+ <div class="modal-dialog modal-lg">
+   <div class="modal-content"  
+     
+  >
+
+  <img src="/img/18915851.jpg" class="img-fluid" alt="Responsive image">
+
+  <div class="alert alert-danger" role="alert">
+                 <h4 class="alert-heading"> فشلت العمليه  !</h4>
+                 <p>    :  لقد فشلت العمليه للاسباب التاليه </p>
+                 <p v-for="(err,index)  in allerros" :key="index"> {{err}}</p>
+                 <hr>
+                 <input type="button" class="btn btn-dark" data-dismiss="modal" value="الغاء">
+              </div>
+   </div>
+ </div>
+</div>
+
    </div>
 </template>
 <script>
@@ -246,7 +272,7 @@ this.projectz()
 this.name = this.data.name
 this.role_idz =  this.data.role_id
 this.email =  this.data.email 
-this.project_id = this.data.project_id
+this.project_id = this.data.contract.project_id ?? ''
      this.salary_per_hour =  this.data.contract.salary_per_hour  ?? '',
             this.salary_per_month = this.data.contract.salary_per_month  ?? '',
             this.fahther_name = this.data.contract.fahther_name  ?? '',
@@ -274,6 +300,9 @@ return{
             password_confirmation:'',
             password:'',
             sign:{},
+            image:'',
+            allerros:[],
+            files:[],
             permit:'',
             name:'',
             email:'',
@@ -335,8 +364,19 @@ let vm = []
 
 
            onImageChange(e) {     
-this.sign = e.target.files[0]
+this.sign ={file:e.target.files[0]}
             },
+
+
+            onpictureChange(e){
+this.image = {file:e.target.files[0]}
+
+
+},
+
+onfilesChange(e){
+this.files = e.target.files[0]
+},
 
 getrole(){
 
@@ -364,9 +404,22 @@ submit(){
                 let formData = new FormData();
 
 
-      if(this.sign !== undefined && this.sign == null){
-	 formData.append('sign', this.sign);
+      if(Object.keys(this.sign).length > 0){
+	 formData.append('sign', this.sign.file);
 }
+
+if(Object.keys(this.image).length > 0){
+	 formData.append('image', this.image.file);
+}
+
+this.files.forEach((element, index, array) => {
+   if(element !== undefined){
+   formData.append('files-' + index, element);
+   }
+    
+   });
+
+
 if(this.name){
 	 formData.append('name', this.name);
 }
@@ -478,7 +531,22 @@ if(this.vacations){
 })
    .then(res=>{
           window.$("#editEmployeeModal").modal("show"); 
-
+          window.location.href = ('/managers/user/usertable')
+    }).catch(error=>{
+ if (error.response.status == 422){
+     if(Array.isArray(error.response.data.errors)){
+         this.allerros = error.response.data.errors;
+     }else{
+         try {
+  this.allerros = JSON.parse(error.response.data.message);
+         }
+         catch{
+                this.allerros = error.response.data.errors;
+         }
+     }
+window.$("#deathEmployeeModal").modal("show"); 
+       
+      }
     })
 },
 

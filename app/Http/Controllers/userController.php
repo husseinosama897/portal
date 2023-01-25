@@ -7,6 +7,7 @@ use App\User;
 use App\role;
 use Illuminate\Support\Facades\Hash;
 use App\user_file;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 class userController extends Controller
 {
@@ -44,6 +45,14 @@ return response()->json(['data'=>$role->user->chunk(30)]);
 
     public function jsonUser(request $request){
 
+$this->validate($request,[
+    'name'=>['string','max:255'],
+    'role_id'=>['numeric'],
+    'laborer'=>['numeric'],
+    'contract_date' =>['date'],
+ 'project_id' =>['numeric'],
+ 'identity_date'=>['date'],
+]);
 
         $data = User::query();
  
@@ -63,28 +72,65 @@ return response()->json(['data'=>$role->user->chunk(30)]);
             $data = $data->where('laborer',$request->laborer);
         }
 
+        if($request->contract_date || $request->project_id || $request->identity_date){
+           
+            $data = $data->whereHas('contract',function($q)use($request){
+                if($request->contract_date){
+                    $qr->where('contract_date',$request->contract_date);
+
+                }
+
+
+                if($request->project_id){
+                    $q->whereHas('project',function($query)use($request){
+                       
+                     return   $query->where('id',$request->project_id);
+        
+                    });
+                }
+                
+
+                if($request->identity_date){
+                    $qr->where('identity_date','>=',$request->identity_date);
+                }
+        
+
+
+            });
+
+        }
+
+
+
+
+   
 
 
         $data = $data->with(['contract'=>function($q)use($request){
-    return $q->with(['project'=>function($qr)use($request){
-        if($request->project_id){
-            $qr->where('project_id',$request->project_id);
-        }
-
-        if($request->contract_date){
-            $qr->where('contract_date',$request->contract_date);
-        }
-
-
-        if($request->contract_ex){
-            $qr->where('contract_date','>=',$request->contract_date);
-        }
-
-        if($request->identity_date){
-            $qr->where('identity_date','>=',$request->identity_date);
-        }
 
           
+    
+    
+        
+            if($request->identity_date){
+                $qr->where('identity_date','>=',$request->identity_date);
+            }
+    
+            if($request->project_id){
+            $q->whereHas('project',function($query)use($request){
+               
+             return   $query->where('id',$request->project_id);
+
+            });
+        }
+
+    return $q->with(['project'=>function($qr)use($request){
+
+        if($request->project_id){
+            $qr->where('id',$request->project_id);
+        }
+
+     
         return $qr;
 
 }]);
@@ -107,6 +153,9 @@ return response()->json(['data'=>$role->user->chunk(30)]);
     public function rig(){
    return view('managers.adduser');     
     }
+
+
+   
     
     public function edit(User $User){
         $data = $User->contract;
@@ -169,7 +218,8 @@ return response()->json(['data'=>$role->user->chunk(30)]);
             'role_id'=>$request->role_id,
             'laborer'=>$request->laborer,
             'sign'=>$fileName,
-            'image'=>$fileName_image
+            'image'=>$fileName_image,
+            'emp_on'=>Str::random(40),
         ]);  
 
 
@@ -266,6 +316,22 @@ return response()->json(['data'=>$role->user->chunk(30)]);
          
          }
    
+
+         if($request->image){
+            $image_tmp = $request->image;
+    
+                $extension = $image_tmp->getClientOriginalExtension();
+                $fileName_image = rand(111,99999).'.'.$extension;
+                $image_tmp->move('uploads/images/users', $fileName_image);
+       
+        }else{
+          $fileName_image = null;
+        
+        }
+    
+    
+
+        
    
    
    if($request->name){
@@ -289,6 +355,14 @@ return response()->json(['data'=>$role->user->chunk(30)]);
                      if($fileName){
                     
                         $User->sign = $fileName;
+
+                        
+                         }
+
+                         
+                     if($fileName_image){
+                    
+                        $User->image = $fileName_image;
 
                         
                          }
@@ -369,5 +443,9 @@ return response()->json(['data'=>$role->user->chunk(30)]);
          $User->manager = 1;
          $User->save();
         }
+    }
+
+    public function delete(User $User){
+        $User->delete();
     }
 }

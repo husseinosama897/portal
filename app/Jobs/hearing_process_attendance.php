@@ -17,7 +17,7 @@ use DB;
 use App\project;
 use App\timesheet_monthly_personal;
 use App\timesheet_monthly_project;
-use App\timesheet_monthly_section;
+use App\monthly_section;
 use App\timesheet_daily_role;
 use App\timesheet_monthly_role;
 use App\timesheet_daily_section;
@@ -59,9 +59,9 @@ class hearing_process_attendance implements ShouldQueue
         $endTime = Carbon::now()->timezone('Asia/Riyadh');
        
         $endTime = Carbon::createFromFormat('Y-m-d H:i:s',$endTime)->timezone('Asia/Riyadh');
-        $totalDuration =  $startTime->diffInHours($endTime);
+        $totalDuration =  $startTime->diffInMinutes($endTime);
       
-        $totalMin =  $startTime->diffInMinutes($endTime)  - 60 * $totalDuration;
+     //   $totalMin =  $startTime->diffInMinutes($endTime)  - 60 * $totalDuration;
     
      
         # We calculate the number of vacation days during the month 
@@ -101,11 +101,11 @@ $totalMin = 0;
             'attending_leaving'=>Carbon::now()->timezone('Asia/Riyadh'),
             'time_difference'=> $totalDuration,
        //     'leaving_image'=>$imageName,
-        'min'=>$totalMin
+      //  'min'=>$totalMin
 
 
         ]);
-$time = ($totalMin / 100 + $totalDuration);
+$time =$totalDuration;
 // ----------------------------- * * * MONTHLY time sheet Personal project * * * ------------------------
 
 if($this->attendance->project_id !== null){
@@ -176,7 +176,9 @@ if($timesheet_daily_project){
   
 if($this->attendance->project_id !== null){
 
-$number = 10; # this test  number of workers 
+
+
+$number = project::find($this->attendance->project_id)->user()->count(); # this test  number of workers 
 
 
 $project_overall = project_overall::where(['date'=>Carbon::now()->startOfMonth(),'project_id'=>$this->attendance->project_id])->first();
@@ -215,8 +217,8 @@ $old =  $project_overall->num_of_attendance * $numbers_util_now / 100 ;
             'num_of_attendance'=>1,
             'performance_point'=>0,
             'time_attendance'=>$this->attendance->time_difference,
-         
-            'project_id'=>$this->attendance->project_id
+         'cost_reduction'=>0,
+            'project_id'=>$this->attendance->project_id ?? null
         ]);
     
     
@@ -239,6 +241,8 @@ $old =  $project_overall->num_of_attendance * $numbers_util_now / 100 ;
 
   // ---------------------------- * * * daily time sheet section * * * -------------------------------------
   
+if(!empty($user->role) && $user->role->section_id !== null){
+
 
   $timesheet_daily_section =     timesheet_daily_section::where(['section_id'=>$user->role->section_id,'date'=>Carbon::now()->format('Y-m-d')])->first();
   
@@ -271,18 +275,52 @@ $old =  $project_overall->num_of_attendance * $numbers_util_now / 100 ;
   
   // ---------------------------- * * * MONTHLY time sheet section * * * -------------------------------------
     
+  $number = $user->role->section()->count();
+
+  $numbers_util_now = $number  * $working_days;
+$increment = 1  *  100  / $numbers_util_now;
+
+
+
   
-    $timesheet_monthly_section =     timesheet_monthly_section::where(['section_id'=>$user->role->section_id,'date'=>Carbon::now()->startOfMonth(),])->first();
+    $monthly_section =     monthly_section::where(['section_id'=>$user->role->section_id,'date'=>Carbon::now()->startOfMonth(),])->first();
     
-    if($timesheet_monthly_section){
-      $timesheet_monthly_section->increment(
-        'time',$time
+    if($monthly_section){
+      $old =  $monthly_section->num_of_attendance * $numbers_util_now / 100 ;
+
+      $monthly_section->increment(
+        'time',$this->attendance->time_difference
       );
+
+      $monthly_section
+      ->increment(
+        'percentage_attendance',($old+$increment)
+      );
+
+
+      $monthly_section
+      ->increment(
+        'num_of_attendance',1
+      );
+
+
+
     }else{
-      $timesheet_monthly_section =     timesheet_monthly_section::create([
+      $monthly_section =     monthly_section::create([
         'section_id'=>$user->role->section_id,
       'date'=>Carbon::now()->startOfMonth(),
-    
+    'percentage_attendance'=>$increment,
+'num_of_attendance'=>1,
+'percentage_performance'=>0,
+'saving_percentage'=>0,
+
+'marketing_project'=>0,
+'percentage_marketing_project'=>0,
+'percentage_deal'=>0,
+'num_deal'=>0,
+
+'cost_reduction'=>0,
+'num_of_performers'=>0,
       'time'=>$this->attendance->time_difference
       
       ]
@@ -291,7 +329,7 @@ $old =  $project_overall->num_of_attendance * $numbers_util_now / 100 ;
     
     }
     
-    
+  }
     
     // ------------------------------ * * * end of MONTHLY time sheet  section * * * ----------------------------------
     
@@ -339,25 +377,29 @@ $old =  $project_overall->num_of_attendance * $numbers_util_now / 100 ;
   
   // ---------------------------- * * * MONTHLY time sheet role * * * -------------------------------------
     
- 
-    $timesheet_monthly_role =     timesheet_monthly_role::where(['role_id'=>$user->role->id,'date'=>Carbon::now()->startOfMonth(),])->first();
+ if(!empty($user->role)){
+
+  $timesheet_monthly_role =     timesheet_monthly_role::where(['role_id'=>$user->role->id,'date'=>Carbon::now()->startOfMonth(),])->first();
     
-    if($timesheet_monthly_role){
-      $timesheet_monthly_role->increment(
-        'time',$this->attendance->time_difference
-      );
-    }else{
-      $timesheet_daily_role =     timesheet_daily_role::create([
-        'role_id'=>$user->role->id,
-      'date'=>Carbon::now()->startOfMonth()
-    ,
-      'time'=>$this->attendance->time_difference
-      
-      ]
-      
-      );
+  if($timesheet_monthly_role){
+    $timesheet_monthly_role->increment(
+      'time',$this->attendance->time_difference
+    );
+  }else{
+    $timesheet_daily_role =     timesheet_daily_role::create([
+      'role_id'=>$user->role->id,
+    'date'=>Carbon::now()->startOfMonth()
+  ,
+    'time'=>$this->attendance->time_difference
     
-    }
+    ]
+    
+    );
+  
+  }
+
+ }
+
     
     
     

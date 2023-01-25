@@ -21,7 +21,10 @@ use App\purchase_order_attachment;
 use App\purchase_order_cycle;
 use App\Exceptions\CustomException;
 use App\payment_term as note;
+use App\product;
 use App\Events\NotificationEvent;
+use App\Jobs\update_pervious_value;
+
 class purchaseController extends Controller
 {
 
@@ -66,7 +69,7 @@ class purchaseController extends Controller
    'delivery_date'=>['required','date','max:255'],
      'cc'=>['string','max:255'],
       'ref'=>['string','max:255'],
-      'to'=>['string','max:255'],
+      
       'supplier_id'=>['required','numeric'],
       
        ]);
@@ -96,7 +99,7 @@ $Purchase_order = Purchase_order::create([
 'subtotal'=>$request->total,
     'ref'=>$request->ref,
     'supplier_id'=>$request->supplier_id,
-    'to'=>$request['to'],
+
     'order_for'=>$request->order_for,
 ]);
 
@@ -152,7 +155,7 @@ foreach($attributes as $attr){
         array('dis' => array('required|string')),
 
         array('unit' => $attr['unit'] ?? null),
-        array('unit' => array('string|max:255')),
+        array('unit' => array('required|string|max:255')),
         
         array('unit_price' => $attr['unit_price'] ?? null),
         array('unit' => array('required','numeric'))
@@ -172,8 +175,26 @@ if(!empty($attr['id'])){
            'total'=>$attr['total'] ?? 0,
          'purchase_order_id'=>$Purchase_order->id, 
         ]);
+
+         
+   $job = (new update_pervious_value($attr['unit_price'] , $attr['id']   ,  auth()->user()->id, $attr['value']  ?? 0 
+   ,auth()->user()->role && auth()->user()->role->section_id !== null ? auth()->user()->role->section_id : null
+   
+   ))->delay(Carbon::now()->addSeconds(90));
+   $this->dispatch($job);
+
         
 }else{
+    
+   $product = product::create([
+    'name'=>$attr['dis'],
+   ]);
+
+   
+
+
+
+
     purchase_order_product::insert([
         'dis'=>$attr['dis'],
         'qty'=>$attr['qty'],
@@ -325,11 +346,9 @@ catch (Exception $e) {
             return  $q->with(['comment_purchase_order_cycle'=> function($qu){
                 return $qu->with('attachment_purchase_order_cycle');
             }])->with('role');
-            }])
-            ->with('purchase_order_attachment')
-            ->with(['attributes'])->with(['attributes2'=>function($q){
+            }])->with(['attributes2'=>function($q){
                 return $q->where('product_id','=',null);
-            }])->with('note')->first();
+            },'purchase_order_attachment','attributes'])->with('note')->first();
         if(!empty($data)){
            
             return view('purchase.update')->with(['data'=>$data]);
@@ -350,7 +369,7 @@ catch (Exception $e) {
   
 
        'ref'=>['string','max:255'],
-       'to'=>['string','max:255'],
+
       
  
         ]);
@@ -386,19 +405,18 @@ if($Purchase_order->total !== null){
 'subtotal'=>$request->total,
     'ref'=>$request->ref,
     'supplier_id'=>$request->supplier_id,
-    'to'=>$request['to'],
     'order_for'=>$request->order_for,
      
  ]);
 
 
 
- /*
+ 
 
  if($request->deletedfiles){
     purchase_order_attachment::find($request->deletedfiles)->delete();
  }
- */
+ 
 
  $Purchase_order_cycle =  $Purchase_order->purchase_order_cycle()->delete();
  $workflow = workflow::where(['name'=>'purchase_order'])->first()->flowworkStep()
@@ -544,7 +562,7 @@ foreach($chunk_notification as $noti){
    
     
         if(!empty($attr['pivot']['product_id'])){
-            $Purchase_order->attributes()->attach($attr['product_id'] ?? null,[
+            $Purchase_order->attributes()->attach($attr['pivot']['product_id'] ?? null,[
                 'dis'=>$attr['dis'] ?? $attr['name'],
                   'qty'=>$attr['pivot']['qty'],
                    'unit'=>$attr['pivot']['unit'],
@@ -552,7 +570,10 @@ foreach($chunk_notification as $noti){
                    'total'=>$attr['pivot']['unit_price'] * $attr['pivot']['qty'] ?? 0,
                  'purchase_order_id'=>$Purchase_order->id, 
                 ]);
-                
+                $job = (new update_pervious_value($attr['pivot']['unit_price'] ,$attr['pivot']['product_id'] , auth()->user()->id
+                ,$attr['value']))->delay(Carbon::now()->addSeconds(90));
+                $this->dispatch($job);
+             
         }else{
             purchase_order_product::insert([
                        'dis'=>$attr['dis'] ?? $attr['name'],

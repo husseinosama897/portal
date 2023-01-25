@@ -1,6 +1,6 @@
 <template>
 <div>
-      <div class="card mt-3">
+      <div class="card mt-6">
            
            <div class="card-body">
              <div class="card-header">
@@ -49,10 +49,12 @@
 
                             <td>{{data.comp ? data.comp : data.customer_name}}</td>
                             <td>{{data.tax_number}} </td>
-                            <td>{{data.email}}</td>
-                          <td>
+
+                            <td>
                             {{data.phone}}
                           </td>
+
+                         
                           <td>
                             {{data.city}}
                           </td>
@@ -66,12 +68,7 @@
               </a>
                            
                             </td>
-                            <td style="width: 50px;">
-                              <span class="custom-checkbox">
-                                <input type="checkbox"  v-model="deleter" id="checkbox1" name="options[]" :value="data.id">
-                                <label for="checkbox1"></label>
-                              </span>
-                            </td>
+                          
                           </tr>
                         </tbody>
                       </table>

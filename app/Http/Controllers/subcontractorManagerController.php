@@ -133,7 +133,7 @@ class subcontractorManagerController extends Controller
     
      
 
-        $subcontractor_request_cycle =  $subcontractor->subcontractor()->orderBy('updated_at', 'DESC')->first();
+        $subcontractor_request_cycle =  $subcontractor->subcontractor()->orderBy('id', 'DESC')->first();
       
 
         
@@ -195,7 +195,10 @@ NotificationEvent::dispatch($subcontractor->user->id,$content);
                 ]);
               
                 // -------------------------  project expenses -------------------------------------
-                $subcontractor->project->increment('subcontractor_expenses',$subcontractor->total);
+
+              $subcontractor->project->subcontractor_expenses !== null ?   $subcontractor->project->increment('subcontractor_expenses',$subcontractor->total)
+
+              : $subcontractor->project->update(['subcontractor_expenses'=>$subcontractor->total]);
 //-------------------------------------------- general report ----------------------------------------
 
                 
@@ -387,7 +390,13 @@ foreach($array_chunk as $chunk){
     
          public function returnasjson(){
           $purchase = auth()->user()->role->subcontractor()
-         ->with('subcontractor_real')->paginate(10);
+         ->with(['subcontractor_real'=>function($q){
+          $q->with(['contract_withsubcontractor'=>function($query){
+            $query->select(['id','contractor_id'])->with(['contractor'=>function($contractor){
+              $contractor->select(['contractor_name','id']);
+            }]);
+          }]);
+        }]) ->paginate(10);
           return response()->json(['data'=>$purchase]);
          }
       

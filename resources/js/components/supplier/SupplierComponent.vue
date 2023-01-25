@@ -206,6 +206,29 @@
                                 </div>
                               </div>
 
+                              
+                              <div class=" row mb-2">
+                        <label for="password" class="col-md-2 col-form-label text-md-right">user name</label>
+                        <div class="col-md-4">
+                           <input id="password" type="password" v-model="user_name" class="form-control @error('password') " name="password"  autocomplete="new-password">
+                        </div>
+                    
+
+                     </div>
+                     
+
+                              <div class=" row mb-2">
+                        <label for="password" class="col-md-2 col-form-label text-md-right">Password</label>
+                        <div class="col-md-4">
+                           <input id="password" type="password" v-model="password" class="form-control @error('password') " name="password"  autocomplete="new-password">
+                        </div>
+                              <label for="password-confirm" class="col-md-2 col-form-label text-md-right">Confirm Password</label>
+                        <div class="col-md-4">
+                           <input id="password-confirm"  v-model="password_confirmation" type="password" class="form-control" name="password_confirmation"  autocomplete="new-password">
+                        </div>
+
+                     </div>
+
                            
                                         <div class="row justify-content-center mt-5 mb-4">
                                           <div class="col-12 col-md-3 col-lg-2 mt-5">
@@ -263,6 +286,9 @@ representative:'',
 phone:'',
 comp:'',
 vat:'',
+user_name:'',
+password:'',
+password_confirmation:'',
                                       postal_code:'',
   status:'',
 building_num:'',
@@ -340,6 +366,16 @@ formData.append('city',this.city)
 }
 
 
+if(this.user_name){
+	 formData.append('user_name', this.user_name);
+}
+if(this.password_confirmation){
+	 formData.append('password_confirmation', this.password_confirmation);
+}
+
+if(this.password){
+	 formData.append('password', this.password);
+}
 
 
 if(this.country){

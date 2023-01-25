@@ -66,7 +66,7 @@ foreach($projects as $project){
     ]);
 
 
-$project->Attending_and_leaving()->update([
+$project->Attending_and_leaving()->whereDate('attending_time',\DB::raw('CURDATE()'))->update([
     'daily_report_id'=>$daily_report->id,
 ]);
 

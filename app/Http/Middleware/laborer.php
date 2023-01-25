@@ -18,11 +18,10 @@ class laborer
     {
        
 
-        if(Auth::check() && Auth::user()->laborer == 1 ){
-            return redirect()->route('laborer.start_day');
-   
+        if(  Auth::check() && Auth::user()->laborer !== 2 || Auth::check() && Auth::user()->laborer !== 1   ){
+            return $next($request);
             }
 
-return $next($request);
+
     }
 }

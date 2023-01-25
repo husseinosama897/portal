@@ -20,7 +20,6 @@ use App\petty_inv;
 use App\Jobs\sendcc;
 use App\attachment_petty_cash_cycle;
 use App\Events\NotificationEvent;
-use App\project_overall;
 class managers_petty_cash_Controller extends Controller
 
 {
@@ -39,33 +38,6 @@ $petty_cash->update([
   'vat'=>$request->vat,
 ]);
 
-
-
-$project_overall = project_overall::where(['date'=>Carbon::now()->startOfMonth(),'project_id'=>$petty_cash->project_id])->first();
-
-  if($project_overall){
-
-          $project_overall->increment('cash_out',$petty_cash->total);
-    
-  }else{
- 
-        project_overall::create([
-            'date'=>Carbon::now()->startOfMonth(),
-            'percentage_performance'=>0,
-            'cash_out'=>$petty_cash->total,
-            'percentage_attendance'=>0,
-            'cash_in'=>0,
-            'num_of_performers'=>0,
-            'num_of_attendance'=>0,
-            'performance_point'=>0,
-            'time_attendance'=>0,
-            'project_id'=>$petty_cash->project_id
-        ]);
-    
-  
-  }
-
-
 }
 
 public function inv(request $request,petty_cash $petty_cash){
@@ -75,8 +47,6 @@ public function inv(request $request,petty_cash $petty_cash){
       'closed'=>1,
     
     ]);
-
-    
     
       if($request->count > 0){
         for($counter = 0;  $counter <= $request->count;  $counter++){
@@ -341,9 +311,9 @@ public function inv(request $request,petty_cash $petty_cash){
          public function returnasjson(request $request){
           $purchase = auth()->user()->role->petty_cash_cycle()->orderBy('created_at','DESC')->whereHas('petty_cash',function($q)use($request){
             if($request->ref){
-                $q->where('ref',$request->ref);
-                
-                      }
+              $q->where('ref', 'LIKE', '%' . $request->ref . '%');
+              
+                    }
 
                       if($request->date){
                         $q->where('date',$request->date);

@@ -13,7 +13,7 @@ class productController extends Controller
   }
   public function autoCompleteProduct(request $request){
 
-    $product = product::where('name', 'LIKE', '%' . $request->name . '%')->select(['id','name','unit'])->get()->take(3);
+    $product = product::where('name', 'LIKE', '%' . $request->name . '%')->select(['id','name','unit','value'])->get()->take(3);
     return response()->json(['data'=>$product]);
     
    }

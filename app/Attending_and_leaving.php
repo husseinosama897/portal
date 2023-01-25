@@ -19,6 +19,17 @@ class Attending_and_leaving extends Model
            'time_difference',
            'leaving_image',
            'attending_image',
-           'min'
+           'min',
+           'scanned_by',
+
     ];
+
+    public function user(){
+        return $this->belongsto(User::class,'user_id');
+    }
+
+    public function scanned(){
+        return $this->belongsTo(User::class,'scanned_by');
+    }
+
 }

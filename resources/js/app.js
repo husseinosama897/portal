@@ -33,6 +33,24 @@ Vue.use(require('vue-moment'));
 
 
 
+//--------------------------- marketing ------------------------------------------------------
+Vue.component('create-marketing', require('./components/marketing/CreateComponent.vue').default);
+
+Vue.component('table-marketing', require('./components/marketing/TableComponent.vue').default);
+
+Vue.component('update-marketing', require('./components/marketing/UpdateComponent.vue').default);
+
+//------------------------------------------------------------------------------------------------
+
+
+
+
+
+Vue.component('table-tender', require('./components/tender/TableComponent.vue').default);
+
+Vue.component('update-tender', require('./components/tender/UpdateComponent.vue').default);
+
+
 
 
 
@@ -41,6 +59,17 @@ Vue.use(require('vue-moment'));
 
 
 // ------------------------- * * * ProjectManager * * * ------------------------------------------------------
+
+
+//--------------------------------|||----- laborer----|||-----------------------------------------------------
+
+
+Vue.component('create-laborer-projectmanager', require('./components/ProjectManager/Laborers/CreateComponent.vue').default);
+
+Vue.component('table-laborer-projectmanager', require('./components/ProjectManager/Laborers/TableComponent.vue').default);
+
+Vue.component('update-laborer-projectmanager', require('./components/ProjectManager/Laborers/UpdateComponent.vue').default);
+
 
 
 //------------------- |||| ------------- manule attendance ----------  |||| --------------------------
@@ -335,10 +364,20 @@ Vue.component('update-emp-task', require('./components/task/UpdateComponent.vue'
 
 
 
-//-------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('laborers-component', require('./components/LaborersPage.vue').default);
+
+
+//--------------------------------------    ---------------------------------------------------
+
+Vue.component('purchase-supplier-table', require('./components/suppliersystem/TableComponent.vue').default);
+
+Vue.component('purchase-suplier-update', require('./components/suppliersystem/UpdateComponent.vue').default);
+
+Vue.component('purchase-suplier-print', require('./components/suppliersystem/PrintPurchase.vue').default);
+
 
 
 

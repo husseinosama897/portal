@@ -85,14 +85,45 @@ var actual = 0
 
 var overall = 0
   this.data.forEach(e=>{
-   
- var percentage_attendance = (Number(e.percentage_attendance) * 0.50 )
+    var percentage_attendance = 0
+    var percentage_performance =0
+    var percentage_section = 0
+   if('procurement' == this.data.role.section.name ){
+    percentage_attendance = (Number(e.percentage_attendance) *   this.data.role.section.percentage_attendance ?? 0.25 )
 
- var percentage_performance =  (Number(e.percentage_performance) * 0.50 )
+percentage_performance =  (Number(e.percentage_performance) * this.data.role.section.percentage_performance ?? 0.25 )
+
+percentage_section =   e.percentage_section *  this.data.role.section.percentage_section ?? 0.50 
+
+   }
+
+   if('marketing' == this.data.role.section.name){
+
+    percentage_attendance = (Number(e.percentage_attendance) *   this.data.role.section.percentage_attendance ?? 0 )
+
+percentage_performance =  (Number(e.percentage_performance) * this.data.role.section.percentage_performance ?? 0 )
+
+percentage_section =   e.percentage_section *  this.data.role.section.percentage_section ?? 0.60 
+
+var percentage_deal = e.percentage_deal ?? 0 * this.data.role.section.percentage_deal ?? 0.40
+
+percentage_section = (Number(percentage_deal ) + Number(percentage_section))
 
 
 
-var total = (Number(percentage_performance) + Number(percentage_attendance) )
+   }
+
+
+   if('user' == this.data.role){
+
+percentage_attendance = (Number(e.percentage_attendance) *   0.50 )
+
+percentage_performance =  (Number(e.percentage_performance) *  0.50 )
+
+}
+
+ 
+var total = (Number(percentage_performance) + Number(percentage_attendance) + percentage_section)
 
 total = total.toFixed(2)
 

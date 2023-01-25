@@ -16,18 +16,22 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name',
-        'permit',
-         'email',
-         'password',
-        'role_id','sign',
-    'contract',
-    'contract_type',
-'working_hours',
-'project_id',
-'laborer',
-'projectmanager_id'
+        'name' ,
+        'email' ,
+        'password' ,
+        'role_id',
+        'laborer',
+        'sign',
+        'image',
+        'emp_on',
+        'supplier_id'
 ];
+
+
+
+public function personal_overall(){
+    return $this->hasMany(personal_overall::class,'user_id');
+}
 
 public function pricing_supplier(){
     return $this->hasMany(pricing_supplier::class,'user_id');
@@ -62,10 +66,11 @@ public function timesheet_project_personal(){
  }
 
  
- public function personal_overall(){
-    return $this->hasMany(personal_overall::class,'user_id');
- }
 
+
+public function marketing(){
+    return $this->HasMany(marketing::class,'user_id');
+}
 
 
 public function projectmanager()
@@ -101,6 +106,10 @@ public function contract(){
     public function contract_withsubcontractor(){
         return $this->HasMany(contract_withsubcontractor::class,'user_id')->orderBy('created_at','DESC');
     }
+
+public function suppliersystem(){
+    return $this->belongsto(supplier::class,'supplier_id');
+}
 
 
     public function salary(){

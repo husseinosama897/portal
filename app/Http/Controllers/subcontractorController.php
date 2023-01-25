@@ -47,7 +47,7 @@ class subcontractorController extends Controller
            
     public function updatepage( $subcontractor){
      
-        if (is_numeric($subcontractor)   && auth()->user()->role->name == 'Projects Manger' ){
+        if (is_numeric($subcontractor)    ){
 
             $data = subcontractor::where('id',$subcontractor)->with(['subcontractor'=>function($q){
                 return  $q
@@ -70,7 +70,7 @@ class subcontractorController extends Controller
 
            
     public function updating(request $request,subcontractor $subcontractor){
-      if($subcontractor->status == 2 && auth()->user()->role->name == 'Projects Manger'){
+     // if($subcontractor->status == 2 ){
 
       
         $data =  $this->validate($request,[
@@ -245,7 +245,7 @@ foreach( $perv->role->user as $flow){
             catch (Exception $e) {
                 return $e;
             }
-          }
+        //  }
         }
 
 
@@ -261,14 +261,14 @@ foreach( $perv->role->user as $flow){
 
 public function index(contract_withsubcontractor $contract_withsubcontractor){
 
-    if(is_numeric($contract_withsubcontractor->id) && $contract_withsubcontractor->status == 1 && auth()->user()->role->name == 'Projects Manger'){
+    if(is_numeric($contract_withsubcontractor->id) && $contract_withsubcontractor->status == 1 ){
 
     return view('subcontractor.index')->with(['id'=>$contract_withsubcontractor->id]);
     }
 }
 
 public function create(contract_withsubcontractor $contract_withsubcontractor){
-    if(is_numeric($contract_withsubcontractor->id) && $contract_withsubcontractor->status == 1 && auth()->user()->role->name == 'Projects Manger'){
+    if(is_numeric($contract_withsubcontractor->id) && $contract_withsubcontractor->status == 1 ){
 
         $data = subcontractor::latest()->select('id','ref')->first();
         $explode = explode("-",$data->ref);
@@ -292,7 +292,7 @@ $num = 'C-'.''.$explode2[1] .'/'. $invoice_num;
 
  
    
-        return view('subcontractor.create')->with(['ref'=>'SI-'.''.$explode[1],'num'=>$num,'contract_total'=>$contract_withsubcontractor->total,'id'=>$contract_withsubcontractor->id,'project_id'=>$contract_withsubcontractor->project_id,'invoice'=>$invoices,'attributes'=>$attributes]);
+        return view('subcontractor.create')->with(['ref'=>'SI-'.''.$explode[1]+1,'num'=>$num,'contract_total'=>$contract_withsubcontractor->total,'id'=>$contract_withsubcontractor->id,'project_id'=>$contract_withsubcontractor->project_id,'invoice'=>$invoices,'attributes'=>$attributes]);
 
     }
  
@@ -469,7 +469,7 @@ subcontractor_request_cycle::insert([
   }
 
   public function subcontractorreturn( $subcontractor){
-    if (is_numeric($subcontractor) && auth()->user()->role->name == 'Projects Manger'){
+    if (is_numeric($subcontractor) ){
         
         $data = subcontractor::where('id',$subcontractor)->with(['attributes'])->with(['subcontractor'=>function($q){
             return  $q
@@ -489,7 +489,7 @@ subcontractor_request_cycle::insert([
    
 
      public function returnasjson(contract_withsubcontractor $contract_withsubcontractor){
-        if(is_numeric($contract_withsubcontractor->id) && $contract_withsubcontractor->status == 1 && auth()->user()->role->name == 'Projects Manger'){
+        if(is_numeric($contract_withsubcontractor->id) && $contract_withsubcontractor->status == 1 ){
       $data = auth()->user()->subcontractor()->where('contract_withsubcontractor_id',$contract_withsubcontractor->id)->orderBy('created_at','DESC')
       ->with(['subcontractor'=>function($q){
         return   $q->with('role');

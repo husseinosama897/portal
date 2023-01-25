@@ -23,6 +23,12 @@ use App\Report\timesheet_monthly_project;
 use App\Report\timesheet_daily_project;
 use App\Report\timesheet_project_personal;
 use App\Attending_and_leaving;
+use App\contract;
+
+use DatePeriod;
+use DateInterval;
+use DateTime;
+
 use App\Jobs\hearing_process_attendance;
 class projectManagerController extends Controller
 {
@@ -372,18 +378,7 @@ $q->WhereHas('project',function($query)use($project){
                 $q->where('project_id',$project->id);
               }
       
-      
-              if($request->from){
-      
-                $q->whereMonth('date','>=',$request->from);
-                 }
-      
-                 if($request->from){
-                  $q->whereMonth('date','>=',$request->to);
-                   }
-         
-      
-      
+ 
            
                   return $q;   
                   
@@ -510,10 +505,16 @@ $data = $data->whereHas('project_overall',function($q)use($request){
 
 });
 $data = $data->with(['project_overall'=>function($q)use($request){
-
+  $from ='';
+  $to ='';
+if($request->from){
   $from = date('m', strtotime($request->from));
+}
+if($request->to){
   $to = date('m', strtotime($request->to));
+}
  
+
   if($from){
       $q->whereMonth('date','>=',$from);
   }
@@ -528,7 +529,37 @@ return $q;
 
 $data =   $data->first();
 
-  return response()->json(['data'=>$data]);
+
+
+if($request->from){
+  $start =  Carbon::createFromFormat('Y-m-d',$request->from)->startOfMonth();
+
+}else{
+  $start = new DateTime(Carbon::now()->startOfMonth());
+
+  
+}
+
+if($request->to){
+  $end =  Carbon::createFromFormat('Y-m-d',$request->to);
+}else{
+  $end = new DateTime(Carbon::now()->format('Y-m-d'));
+}
+
+$interval = new DateInterval('P1D');
+$daterange = new DatePeriod($start, $interval ,$end);
+
+$weekends = 0;
+
+foreach($daterange as $date){
+    $days = $date->format('D');
+    if ($days == 'Fri') { # we set friday
+        $weekends++;
+    }
+}
+
+
+  return response()->json(['data'=>$data,'weekends'=>$weekends]);
 }
 //----------------------- manule attendance -----------------------------------
 
@@ -560,18 +591,11 @@ public function attendance_absence_manule(request $request){
   
     $endTime = Carbon::createFromFormat('Y-m-d H:i:s',$request->to);
   
-    $totalDuration =  $startTime->diffInHours($endTime);
+    $totalDuration =  $startTime->diffInMinutes($endTime);
   
-    $totalMin =  $startTime->diffInMinutes($endTime)  - 60 * $totalDuration;
+   
   
-  
-  if($totalMin >= 55){
-  $totalDuration += 1;
-  $totalMin = 0;
-  }else{
-    $totalDuration += $totalMin / 100;
-  }
-  
+
   
   $attendance = [];
   
@@ -612,9 +636,187 @@ public function attendance_absence_manule(request $request){
   
   }
   
+//------------------------------------ laborers ---------------------------------------------
+
+public function index_laborer(){
+  $projects = auth()->user()->projectmanager()->select(['id','projectmanager_id','name'])->get();
+            
+  return view('ProjectManager.Laborers.index')->with('projects',$projects);
+}
+
+public function json_laborer(request $request){
+
+  $User = User::query();
+  if($request->name){
+    $User = $User->where('name', 'LIKE', '%' . $request->name . '%');
+
+  }
+
+  $User = $User->where('id','!=',auth()->user()->id );
+
+  if($request->project_id){
+
+    $User = $User->WhereHas('contract',function($q) use($request){
+return $q->where('project_id',$request->project_id);
+
+    })->with(['contract'=>function($q) use($request){
+
+    return $q->where('project_id',$request->project_id)->with('project');
+
+    }]);
+ 
+  }else{
+    $array_id = [];
+
+    $projects = auth()->user()->projectmanager()->get();
+foreach($projects as $project){
+
+  $array_id [] = [
+    $project->id
+  ];
+
+}
 
 
+    $User = $User->WhereHas('contract',function($q) use($request,$array_id){
 
-      }
+      return $q->whereIn('project_id',$array_id);
       
+          })->with(['contract'=>function($q) use($request){
+      
+          return $q->where('project_id',$request->project_id)->with('project');
+      
+          }]);
+
+  }
+
+
+ $User = $User->select(['id','name','laborer']);
+ $User = $User->paginate(10);
+  return response()->json(['data'=>$User]);
+  
+ }
+
+  public function edit_laborer(User $User){
+    $data = $User->contract;
+    $projects = auth()->user()->projectmanager()->select(['id','projectmanager_id','name'])->get();
+            
+    return view('ProjectManager.Laborers.update')->with(['data'=>$User,'projects'=>$projects]);
+}
+
+
+
+    public function create_laborer(){
+      $projects = auth()->user()->projectmanager()->select(['id','projectmanager_id','name'])->get();
+        
+        return view('ProjectManager.Laborers.create')->with(['projects'=>$projects]);
+    }
+
+    public function add_laborer(request $request){
+        
+        $this->validate($request, [
+               'name' => ['required', 'string', 'max:255'],
+               'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+               'password' => ['required', 'string', 'min:8', 'confirmed'],
+   
+           ]);
+           
+   
+      $user =      User::create([
+          'name' => $request->name,
+               'email' => $request->email,
+               'password' => Hash::make($request->password),
+               'laborer'=>1
+         
+]);  
+
+/*
+contract::insert([
+ 
+    'user_id'=>$user->id,
+  'vacations'=>$request->vacations,
+   'weekly_vacation'=>$request->weekly_vacation,
+   'project_id'=>$request->project_id,
+    'contract_date'=>$request->contract_date,
+  'contract_ex'=>$request->contract_ex,
+
+'working_hours'=>$request->contract_type,
     
+'salary_per_hour'=>$request->salary_per_hour,
+'salary_per_month'=>$request->salary_per_month,
+'fahther_name'=>$request->fahther_name,
+'address'=>$request->address,
+'type_of_identity'=>$request->type_of_identity,
+'identity'=>$request->identity,
+'identity_date'=>$request->identity_date,
+'identity_source'=>$request->identity_source,
+'build_number'=>$request->build_number ,
+'city'=>$request->city,
+'street'=>$request->street,
+'phone'=>$request->phone,
+]);
+*/
+
+       }
+
+
+       public function update_laborer( request $request , User $User ){
+
+
+        $this->validate($request, [
+          'name' => ['required', 'string', 'max:255'],
+          'email' => [ 'string', 'email', 'max:255', 'unique:users'],
+          'password' => [ 'string', 'min:8', 'confirmed'],
+
+      ]);
+      
+
+        
+      if($request->name){
+        $User-> name = $request->name;
+       }
+             
+                if($request->email){
+               $User->email = $request->email;
+                }
+                
+                if($request->password){
+                    $User->password = Hash::make($request->password);
+                     }
+
+                     $User->save();
+/*
+
+$User->contract->update([
+
+  'vacations'=>$request->vacations,
+  'weekly_vacation'=>$request->weekly_vacation,
+  'project_id'=>$request->project_id,
+   'contract_date'=>$request->contract_date,
+ 'contract_ex'=>$request->contract_ex,
+
+'working_hours'=>$request->contract_type,
+   
+'salary_per_hour'=>$request->salary_per_hour,
+'salary_per_month'=>$request->salary_per_month,
+'fahther_name'=>$request->fahther_name,
+'address'=>$request->address,
+'type_of_identity'=>$request->type_of_identity,
+'identity'=>$request->identity,
+'identity_date'=>$request->identity_date,
+'identity_source'=>$request->identity_source,
+'build_number'=>$request->build_number ,
+'city'=>$request->city,
+'street'=>$request->street,
+'phone'=>$request->phone,
+     
+]);
+*/
+
+
+       }
+
+
+
+       
+}

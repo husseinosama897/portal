@@ -75,12 +75,15 @@ $supplier = $supplier->orwhere('comp', 'LIKE', '%' . $request->name . '%');
    'phone'=>['string','max:255'],
    'location'=>['string','max:255'],
    'city'=>['string','max:255'],
-
-   'email'=>['string','max:255'],
+   
+   'user_name' => ['required', 'string', 'max:255'],
+   'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+   'password' => ['required', 'string', 'min:8', 'confirmed'],
       ]);
       
+
       
-      supplier::create([
+    $supplier =   supplier::create([
           'personal'=>$request->personal,
           
         'customer_name'=>$request->customer_name,
@@ -100,6 +103,15 @@ $supplier = $supplier->orwhere('comp', 'LIKE', '%' . $request->name . '%');
       'vat'=>$request->vat,
       'email'=>$request->email,
       ]);
+
+      
+  $user =  User::create([
+    'name' => $request->user_name,
+    'email' => $request->email,
+    'password' => Hash::make($request->password),
+    'supplier_id'=>$supplier->id,
+
+]);  
       
       return response()->json('done',200);
     

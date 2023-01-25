@@ -8,7 +8,8 @@ class role extends Model
 {
 
 protected $fillable = [
-    'name'
+    'name',
+    'section_id'
 ];
 
 
@@ -65,6 +66,9 @@ public function pricing_supplier_cycle(){
         return $this->HasMany(User::class,'role_id');
     }
     
+    public function section(){
+        return $this->belongsto(section::class,'section_id');
+    }
 
     public function permission(){
         return $this->belongstomany(permission::class,'permission_role');

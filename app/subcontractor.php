@@ -23,6 +23,7 @@ class subcontractor extends Model
 'payment_no',
 'contract_withsubcontractor_id',
 'contract_no',
+'paid'
     ];
     
     
@@ -63,6 +64,13 @@ public function project(){
 public function contract_withsubcontractor(){
    return $this->belongsto(contract_withsubcontractor::Class,'contract_withsubcontractor_id');
 }
+
+
+
+public function paids(){
+   return $this->HasMany(subcontractor_paid::class,'subcontractor_id');
+}
+
 
 
 }

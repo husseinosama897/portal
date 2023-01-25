@@ -6,14 +6,14 @@
                                         <div class="row ">
                                           
                                             <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">
-                                                <label for="birthday">اسم العامل</label>
-                                                <input @input="datajson"  v-model="employee" type="text" id="birthday" name="birthday" class="form-control">
+                                                <label for="birthday">user</label>
+                                                <input   v-model="employee" type="text" id="birthday" name="birthday" class="form-control">
 
                                             </div>
                                              <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">
-                                                 <label for="birthday">المشروع </label>
+                                                 <label for="birthday">project </label>
    <div class="form-group">
-                                  <select class="form-select select2" @change="datajson" v-model="project_id">
+                                  <select class="form-select select2"  v-model="project_id">
                               <option  value=""></option>
                                  <option v-for="project in projects" :key="project.id" :value="project.id" style="line-height: normal;
     color: #000;">{{project.name}}</option>
@@ -25,19 +25,19 @@
   
   <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">
                                                 <label for="birthday">contract_date </label>
-                                                <input @input="datajson"   type="date"  v-model="contract_date" id="birthday" name="birthday" class="form-control">
+                                                <input    type="date"  v-model="contract_date" id="birthday" name="birthday" class="form-control">
 
                                             </div>
 
                                             <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">
                                                 <label for="birthday">contract_ex </label>
-                                                <input @input="datajson"   type="date"  v-model="contract_date"  id="birthday" name="birthday" class="form-control">
+                                                <input    type="date"  v-model="contract_date"  id="birthday" name="birthday" class="form-control">
 
                                             </div>
 
                                             <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">
                                                 <label for="birthday">identity_date </label>
-                                                <input @input="datajson"   type="date"  v-model="identity_date"  id="birthday" name="birthday" class="form-control">
+                                                <input    type="date"  v-model="identity_date"  id="birthday" name="birthday" class="form-control">
 
                                             </div>
 
@@ -46,8 +46,8 @@
 
 
                         <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">
-                          <label for="password-confirm" class="col-md-2 col-form-label text-md-right">role </label>
-                           <select  class="form-control select2" @change="datajson" v-model="role_idz">
+                          <label for="password-confirm" >role </label>
+                           <select  class="form-control select2"  v-model="role_idz">
                               <option    v-for="role in roles"   :key="role.id" :value="role.id">{{role.name}}</option>
                            </select>
                         </div>
@@ -56,8 +56,8 @@
                     
                         
                         <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12">
-                          <label for="password-confirm" class="col-md-2 col-form-label text-md-right">type </label>
-                           <select  class="form-control select2" @change="datajson" v-model="laborer">
+                          <label for="password-confirm" >type </label>
+                           <select  class="form-control select2"  v-model="laborer">
                               <option    value="1">laborer</option>
                               <option    value="0">employee</option>
                            </select>
@@ -88,7 +88,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="data in datas.data " :key="data.id">
+                                            <tr v-for="(data,index) in datas.data " :key="data.id">
                                               
                                                 <td data-table="role">{{data.id}}</td>
                                                 <td data-table="name"><a :href="'/managers/HR/profile/'+data.id">{{data.name}}</a></td>
@@ -112,7 +112,11 @@
 
       <a class="dropdown-item" @click="attending(data)" href="#" data-toggle="modal" data-target="#exampleModal">  attendance : {{data.name}} </a>
 
+      <a class="dropdown-item" @click="dele(data,index)" href="#" data-toggle="modal" data-target="#exampleModal">  delete </a>
+
   <a class="dropdown-item" :href="'/admin/user/edit/'+data.id"  >edit</a>
+
+  <a class="dropdown-item" :href="'/managers/HR/card/'+data.id"  >card</a>
     
       <a class="dropdown-item" @click="manager(data)"  v-if="data.manager == 1" >make  user</a>
           <a class="dropdown-item" @click="manager(data)"  v-if="data.manager == 0" >make  manager</a>
@@ -257,7 +261,7 @@ dele(data,index){
       if(confirm("Do you really want to delete?")){
 
 axios({
-    url:'/user/delete_matrial_request_data/'+data.id,
+    url:'/managers/user/delete/'+data.id,
     method:'post',
 }).then(res=>{
 this.datas.data.splice(index,1)
@@ -267,19 +271,38 @@ this.datas.data.splice(index,1)
       }
 },
     getResults(page = 1) {
-		axios({
-  method: 'post',
-  url: '/managers/user/jsonUser?page=' + page,
-  data:{
-   project_id: this.project_id,
-   laborer:this.laborer,
-   role_id:this.role_idz,
-  contract_date:this.contract_date ,
-  contract_ex:this.contract_ex,
-  identity_date:this.identity_date,
- name:this.employee,
+      let formData = new FormData();
+
+      if(this.project_id){
+	 formData.append('project_id', this.project_id);
 }
-})		.then(response => {
+if(this.laborer){
+	 formData.append('laborer', this.laborer);
+}
+if(this.role_idz){
+	 formData.append('role_id', this.role_idz);
+}
+if(this.contract_date){
+	 formData.append('contract_date', this.contract_date);
+}
+if(this.contract_ex){
+	 formData.append('contract_ex', this.contract_ex);
+}
+ 
+if(this.identity_date){
+	 formData.append('identity_date', this.identity_date);
+}
+if(this.employee){
+	 formData.append('name', this.employee);
+}
+
+ 
+
+      axios.post('/managers/user/jsonUser?page=' + page ,formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data' },
+})
+		.then(response => {
                     
               this.datas =  response.data.data
             
@@ -287,16 +310,34 @@ this.datas.data.splice(index,1)
     },
 
     datajson() {
-		axios({
-  method: 'post',
-  url: '/managers/user/jsonUser' ,
-  data:{
-   project_id: this.project_id,
-   laborer:this.laborer,
-   role_id:this.role_idz,
- name:this.employee,
+      let formData = new FormData();
+
+      if(this.project_id){
+	 formData.append('project_id', this.project_id);
 }
-})		.then(response => {
+if(this.laborer){
+	 formData.append('laborer', this.laborer);
+}
+if(this.role_idz){
+	 formData.append('role_id', this.role_idz);
+}
+if(this.contract_date){
+	 formData.append('contract_date', this.contract_date);
+}
+if(this.contract_ex){
+	 formData.append('contract_ex', this.contract_ex);
+}
+ 
+if(this.identity_date){
+	 formData.append('identity_date', this.identity_date);
+}
+if(this.employee){
+	 formData.append('name', this.employee);
+}
+  axios.post('/managers/user/jsonUser',formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data' },
+}).then(response => {
                     
               this.datas =  response.data.data
             
@@ -365,6 +406,37 @@ let vm = []
     })
     },  
  
+ },
+
+ watch:{
+
+ 'project_id':function(){
+  this.datajson()
+ },
+
+ 'laborer':function(){
+  this.datajson()
+ },
+
+ 'contract_ex':function(){
+  this.datajson()
+ },
+
+ 'identity_date':function(){
+  this.datajson()
+ },
+ 'employee':function(){
+  this.datajson()
+ },
+
+ 'contract_date':function(){
+  this.datajson()
+ },
+
+ 'role_idz':function(){
+  this.datajson()
+ },
+
  },
  
  mounted() {

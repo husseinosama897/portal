@@ -11,6 +11,7 @@ class product extends Model
         'name',
         'unit',
         'type',
+        'value',
        'barcode',
        'size',
       'dis',

@@ -1,4 +1,4 @@
-@extends('layouts.NewManage')
+@extends('layouts.NewApp')
 
 @section('content')
 

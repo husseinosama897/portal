@@ -32,8 +32,13 @@ class Purchase_order extends Model
     'to',
      'order_for',
      'total',
-     'vat'
+     'vat',
+     'paid',
    ];
+
+public function paids(){
+   return $this->HasMany(purchase_paid::Class,'purchase_order_id');
+}
 
    public function attributes(){
       return $this->belongstomany(product::class,'purchase_order_products')

@@ -70,7 +70,8 @@ from:'',
 to:'',
 userapprovel:{},
 divide:'',
-
+overtimecheck:true,
+weekends:'',
 datas:{
 
 },
@@ -91,7 +92,7 @@ computed:{
    var newData = []
 this.customizing.forEach(e=>{
 
-
+if(e.role){
     var role = e.laborer == 1 ? 'laborer' : e.role.name
 
          let item  = newData.find(user=>
@@ -110,7 +111,7 @@ if(e.laborer == 1){
     })
 }else{
     newData.push({
-        name:e.role.name,
+        name:e.role.name ?? 'unknown',
         data:[{time:newTime,amount:e.amount,name:e.name}],
         number:1
     })
@@ -142,6 +143,7 @@ newData.push({
  item.data.push([  newTime,e.amount ])
 }
 */
+}
 })
  
 
@@ -187,9 +189,9 @@ if(this.datas.data && this.datas.data.length > 0){
 this.datas.data.forEach(e=>{
  if(e.contract){
   
-    var time =(e.timesheet_project_personal_sum_time ?  e.timesheet_project_personal_sum_time : e.timesheet_monthly_personal_sum_time )
-
-    this.working_day = moment(this.from, "YYYY-MM").daysInMonth()
+    var time =(e.timesheet_project_personal_sum_time ?  e.timesheet_project_personal_sum_time : e.personal_overall_sum_time ) / 60
+  time = time.toFixed(2)
+    this.working_day = (moment(this.from, "YYYY-MM").daysInMonth() -  this.weekends)
 
 var salaryPerDay = (Number(e.contract.salary_per_month ) / Number(this.working_day))
  salaryPerDay = salaryPerDay.toFixed(2)
@@ -198,19 +200,19 @@ var salaryperHour = (Number(salaryPerDay )  / 9 )
 
 salaryperHour = salaryperHour.toFixed(2)
 
- var overtime = ( Number(time)  - Number(e.contract.working_hours))
- overtime = overtime.toFixed(2)
- var Absence = 0
- if(e.Absence > 0){
- Absence = (Number(salaryperHour)  * Number(e.contract.working_hours) * Number(e.Absence))
- Absence = Absence.toFixed(2)
- }
+var overtime =    this.overtimecheck ? 0 :  (  Number(time) -  Number(9) > 0  ?   Number(time) -  Number(9) : 0 )
+  overtime = overtime.toFixed(2)
+  var Absence = 0
+  if(e.Absence > 0){
+  Absence = (Number(salaryperHour)  * Number(9) * Number(e.Absence))
+  Absence = Absence.toFixed(2)
+  }
 
 
- var amount = (Number(overtime) * salaryperHour + Number(time) *  Number(salaryperHour)  - Absence )
- amount = amount.toFixed(2)
+  var amount = (Number(overtime) * salaryperHour + Number(time  <= 9 ? time : 9 ) *  Number(salaryperHour)  - Absence )
+  amount = amount.toFixed(2)
 
-newData.push({ time: time ?? 0 ,laborer:e.laborer, name:e.name,role:e.role ,id:e.id,Deduction:Absence , contract:e.contract , salaryperHour:salaryperHour ,salaryPerDay:salaryPerDay,overtime:overtime ?? 0 ,amount:amount ?? 0 })
+newData.push({ time: time ?? 0 ,laborer:e.laborer, name:e.name,role:e.role ?? null ,id:e.id,Deduction:Absence , contract:e.contract , salaryperHour:salaryperHour ,salaryPerDay:salaryPerDay,overtime:overtime ?? 0 ,amount:amount ?? 0 })
 
  }
 
@@ -238,7 +240,7 @@ to:this.to,
 })		.then(response => {
                    
              this.datas =  response.data
-           
+           this.weekends = response.data.weekends
                })
    },
 

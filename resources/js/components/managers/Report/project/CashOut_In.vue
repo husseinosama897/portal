@@ -120,7 +120,7 @@ net_profit = net_profit.toFixed(2)
         this.series[1].data.push(_in)
         this.series[2].data.push(net_profit)
     
-        actual = (Number(net_profit) + Number(actual))
+        actual = (Number(net_profit   ) + Number(actual))
 
         overall = (Number(_in) + Number(overall))
               
@@ -130,8 +130,7 @@ net_profit = net_profit.toFixed(2)
               this.output = this.output.toFixed(2)
 
              var exponent = (1 / this.series[0].data.length)
-
-             var st = this.series[2].data[2] / this.series[2].data[this.series[2].data.length - 1]
+             var st = (Number(this.series[0].data[this.series[0].data.length - 1]) / Number(this.series[0].data[0]  > 0 ? this.series[0].data[0] : 0.01  )   )
 
          this.growth_rate =     Math.pow(st,exponent) - 1 
 

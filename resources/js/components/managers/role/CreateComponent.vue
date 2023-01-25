@@ -14,6 +14,18 @@
                          </div>
 
 
+                         <div class="col-xl-2 mb-2">
+                            <div class="form-group">
+                               <label for="password" class="form-label"> section</label>
+                             
+                               <select class="form-control" v-model="section_id" >
+                                 <option></option>
+                                 <option v-for="sectio in section" :value="sectio.id" :key="sectio.id">{{ sectio.name }}</option>
+                               </select>
+
+                            </div>
+                         </div>
+                         
                       </div>
                       <div class="row">
 
@@ -37,7 +49,7 @@
                       >
 
 export default {
-        props:['permission'],
+        props:['permission','section'],
         data(){
 return{
 name:'',
@@ -66,6 +78,8 @@ axios({
         name:this.name,
        permission:JSON.stringify(data)
     }
+}).then(res=>{
+   window.location.href = ('/managers/role/')
 })
 }
 

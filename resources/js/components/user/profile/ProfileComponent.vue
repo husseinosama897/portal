@@ -35,7 +35,7 @@
                                 <span><i class="fe fe-map-pin fs-20"></i></span>
                             </div>
                             <div>
-                                <strong>{{data.contract.country }}</strong>
+                                <strong>{{data.contract ? data.contract.country : '' }}</strong>
                             </div>
                         </div>
                         <div class="d-flex align-items-center mb-3 mt-3">
@@ -43,7 +43,7 @@
                                 <span><i class="fe fe-phone fs-20"></i></span>
                             </div>
                             <div>
-                                <strong>{{data.contract.phone }} </strong>
+                                <strong>{{data.contract   ? data.contract.phone : '' }} </strong>
                             </div>
                         </div>
                         <div class="d-flex align-items-center mb-3 mt-3">
@@ -60,7 +60,7 @@
     <span>Contract expiry date</span>
 </div>
 <div>
-    <strong> :  {{data.contract.contract_ex }} </strong>
+    <strong> :  {{data.contract ? data.contract.contract_ex :''  }} </strong>
 </div>
 </div>
 
@@ -70,7 +70,7 @@
     <span>salary per month</span>
 </div>
 <div>
-    <strong> :  {{data.contract.salary_per_month }} </strong>
+    <strong> :  {{data.contract ? data.contract.salary_per_month : '' }} </strong>
 </div>
 </div>
 
@@ -80,7 +80,7 @@
     <span>Transportation_Allowance</span>
 </div>
 <div>
-    <strong> :  {{data.contract.Transportation_Allowance }} </strong>
+    <strong> :  {{data.contract ? data.contract.Transportation_Allowance :'' }} </strong>
 </div>
 </div>
 
@@ -90,7 +90,7 @@
     <span>Communication Allowance</span>
 </div>
 <div>
-    <strong> :  {{data.contract.Communication_Allowance }} </strong>
+    <strong> :  {{data.contract ? data.contract.Communication_Allowance : '' }} </strong>
 </div>
 </div>
 
@@ -99,7 +99,7 @@
     <span>Food_Allowance </span>
 </div>
 <div>
-    <strong> :  {{data.contract.Food_Allowance }} </strong>
+    <strong> :  {{data.contract ? data.contract.Food_Allowance : '' }} </strong>
 </div>
 </div>
 <div class="d-flex align-items-center mb-3 mt-3">
@@ -107,7 +107,7 @@
     <span>Other Allowance </span>
 </div>
 <div>
-    <strong> :  {{data.contract.Other_Allowance }} </strong>
+    <strong> :  {{data.contract ? data.contract.Other_Allowance : '' }} </strong>
 </div>
 </div>
 

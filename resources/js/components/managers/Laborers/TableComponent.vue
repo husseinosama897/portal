@@ -53,6 +53,8 @@
    
 
                                 <div class="table-responsive">
+                                  
+                               
                                     <table id="basic-datatable" class="table dt-responsive nowrap w-100">
                                         <thead>
                                             <tr>
@@ -70,6 +72,7 @@
                                                 <th><strong>Other Allowance</strong></th>   
                                                 <th><strong>Working Hour on contract</strong></th>
                                                 <th><strong>Working Hour</strong></th> 
+                                                <th><strong>CheckBoxOver Time</strong></th> 
                                                 <th><strong>Over Time</strong></th> 
                                                 <th><strong>Deduction</strong></th> 
                                                
@@ -79,7 +82,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="data in customizing " :key="data.id">
+                                            <tr v-for="data in updated " :key="data.id">
                                               
                                                 <td data-table="name">{{data.name}}</td>
                                                  <td data-table="project" v-if="data.contract && data.contract.project" >{{data.contract ? data.contract.project.name  : 'unknown'}}</td>
@@ -122,8 +125,11 @@
                                      data.time 
                                                 }}</td>
 
-<td data-table="OverTime" v-if="data.contract && data.time >= data.contract.working_hours">{{ data.overtime}}</td>
-                                                 <td data-table="OverTime" v-else>0</td>
+
+<td data-table="CheckBoxOverTime" >   <input   v-model="data.overtimecheck" class="form-check-input" type="checkbox"> 
+</td>
+<td data-table="OverTime" >{{ data.overtime}}</td>
+                                             
 
                                                  <td data-table="Deduction" v-if="data.Deduction > 0">{{data.Deduction}}</td>
                                                  <td data-table="Deduction" v-else>0</td>
@@ -296,6 +302,10 @@ return{
  to:'',
  userapprovel:{},
  divide:'',
+ weekends:'',
+newData2:[],
+
+ overtimecheck:true,
 
 datas:{
 
@@ -313,81 +323,54 @@ attending_time:'',
 
 computed:{
 
-  classificationAndcleaingdata(){
-    var newData = []
-this.customizing.forEach(e=>{
-
-          let item  = newData.find(user=>
-  e.role.name == user.name
-)
-
-var newTime = (Number(e.time ?? 0) + Number(e.over_time ?? 0)) 
-if(item == undefined){
-newData.push({
-  name:e.role.name,
-  data:[
-    
-  [newTime,e.amount] 
-
-  ]
-})
- 
-}else{
-  item.data.push([  newTime,e.amount ])
-}
-
-})
-
-return newData
-
-  },
-
-
-customizing(){
- var newData = []
- if(this.datas.data && this.datas.data.length > 0){
- this.datas.data.forEach(e=>{
-  if(e.contract){
-   
-     var time =(e.timesheet_project_personal_sum_time ?  e.timesheet_project_personal_sum_time : e.timesheet_monthly_personal_sum_time )
-     
 
 
 
- var salaryPerDay = (Number(e.contract.salary_per_month ) / Number(this.working_day))
-  salaryPerDay = salaryPerDay.toFixed(2)
-  
- var salaryperHour = (Number(salaryPerDay )  / 9 )
 
- salaryperHour = salaryperHour.toFixed(2)
 
-  var overtime = ( Number(time)  - Number(e.contract.working_hours))
+
+updated(){
+
+
+    this.newData2.forEach(e=>{
+
+ var overtime = 0
+
+
+ if(e.overtimecheck  == false && e.time > 0 ){
+   overtime =(Number(e.time) - (e.personal_overall_sum_num_of_attendance * 9)   > 0  ?  Number(e.time) -  (e.personal_overall_sum_num_of_attendance * 9)   : 0 )
+} 
+
   overtime = overtime.toFixed(2)
-  var Absence = 0
-  if(e.Absence > 0){
-  Absence = (Number(salaryperHour)  * Number(e.contract.working_hours) * Number(e.Absence))
-  Absence = Absence.toFixed(2)
-  }
 
+ Vue.set(e,'overtime',overtime)
 
-  var amount = (Number(overtime) * salaryperHour + Number(time) *  Number(salaryperHour)  - Absence )
+ if( e.time > 0 ){
+ var defaultt = ( Number(e.time) - Number(e.personal_overall_sum_num_of_attendance) * 9   )  > 0  ? ( Number(e.time) - Number(e.personal_overall_sum_num_of_attendance) * 9   ) : 0
+  
+ var overall =  Number(e.time ) - Number(defaultt) > 0 ? Number(e.time ) - Number(defaultt) : 0
+
+  var amount = (Number(overtime) * e.salaryperHour + Number(overall  )   *  Number(e.salaryperHour)  - e.Deduction )
   amount = amount.toFixed(2)
 
-newData.push({ time: time ?? 0 , name:e.name,role:e.role ,id:e.id,Deduction:Absence , contract:e.contract , salaryperHour:salaryperHour ,salaryPerDay:salaryPerDay,overtime:overtime ?? 0 ,amount:amount ?? 0 })
 
-  }
+
+
+  Vue.set(e,'amount',amount)
+ }
 
 
   })
- }
- 
-  return newData
-}
 
+  return this.newData2
+
+ 
+}
+ 
 },
         methods:{
 
-          
+       
           attendance_user(){
   axios({
   method: 'post',
@@ -410,6 +393,8 @@ attending_time:moment(this.attending_time).format('YYYY-MM-DD HH:mm:ss')
             this.specific_user = {}    
             this.specific_user = data
           },
+
+
 
 
                                                     projectz(){
@@ -467,7 +452,7 @@ data:{
 })		.then(response => {
                     
               this.datas =  response.data.data
-            
+              this.customizing()
                 })
     },
 
@@ -484,7 +469,7 @@ data:{
 })		.then(response => {
                     
               this.datas =  response.data.data
-            
+         
                 })
     },
 
@@ -533,17 +518,70 @@ axios({
 })		.then(response => {
                     
 
-this.working_day = moment.duration(moment(this.to).diff(moment(this.from)));
-this.working_day = (parseInt(this.working_day.asDays()) + 1)
 
               this.datas =  response.data.data
-            
+            this.weekends = response.data.weekends
+
+            this.customizing()
                 })
     },
 
 
  
  
+    customizing(){
+this.newData2 = []
+ if(  this.datas.data && this.datas.data.length > 0){
+ 
+ this.datas.data.forEach(e=>{
+  if(e.contract){
+   
+     var time =(e.timesheet_project_personal_sum_time  ?  (e.timesheet_project_personal_sum_time  / 60) : (e.personal_overall_sum_time / 60) )
+     
+time = time.toFixed(2)
+
+var days = (Number(this.working_day)  - Number(this.weekends))
+
+ var salaryPerDay = (Number(e.contract.salary_per_month ) / days )
+  salaryPerDay = salaryPerDay.toFixed(2)
+  
+ var salaryperHour = (Number(salaryPerDay )  / 9 )
+
+ salaryperHour = salaryperHour.toFixed(2)
+ var overtime = 0
+
+
+if(e.overtimecheck  == false){
+   overtime =( Number(time) - Number(e.personal_overall_sum_num_of_attendance) * 9   )  > 0  ? ( Number(time) - Number(e.personal_overall_sum_num_of_attendance) * 9   ) : 0
+} 
+
+  overtime = overtime.toFixed(2)
+
+  var Absence = 0
+  if(e.Absence > 0){
+  Absence = (Number(salaryperHour)  * Number(9) * Number(e.Absence))
+  Absence = Absence.toFixed(2)
+  }
+
+
+  var defaultt = ( Number(time) - Number(e.personal_overall_sum_num_of_attendance) * 9   )  > 0  ? ( Number(time) - Number(e.personal_overall_sum_num_of_attendance) * 9   ) : 0
+  
+var overall =  Number(time ) - Number(defaultt) > 0 ? Number(time ) - Number(defaultt) : 0
+  var amount = (Number(overtime) * salaryperHour +   overall   *  Number(salaryperHour)  - Absence )
+  amount = amount.toFixed(2)
+
+  this.newData2.push({ time: time ?? 0,overtimecheck:true ,personal_overall_sum_num_of_attendance :e.personal_overall_sum_num_of_attendance , name:e.name,role:e.role ,id:e.id,Deduction:Absence , contract:e.contract , salaryperHour:salaryperHour ,salaryPerDay:salaryPerDay,overtime:overtime ?? 0 ,amount:amount ?? 0 })
+
+  }
+
+
+  })
+ }
+
+
+
+},
+
  
  },
         mounted() {

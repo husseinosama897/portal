@@ -816,7 +816,7 @@ sum = (Number(15) * Number(this.totalAmount) / Number(100)) ?? 0
 
        watch:{
          'total_expenses':function(){
-            if(this.total_expenses  >= this.projectselected.subcontractor_expenses){
+            if(this.total_expenses  > this.projectselected.subcontractor_budget){
 
                window.$("#LowBudgetModal").modal("show"); 
       

@@ -24,6 +24,7 @@ export
                                                 <th><strong>invoice #</strong></th>
                                                 
                                                 <th><strong>DESCRIPTION</strong></th>
+                                                <th><strong>CONTRACTOR</strong></th>
                                              
       <th><strong>Delivery feedback</strong></th>
                                                <th><strong>Attachment</strong></th>
@@ -43,7 +44,10 @@ export
                                                 <td data-table="invoice #">{{data.subcontractor_real.invoice_ON }}</td>
         <td data-table="USER" v-if=" data.subcontractor_real.user ">{{data.subcontractor_real.user.name}}</td>
                                                 <td data-table="DESCRIPTION">{{data.subcontractor_real.subject}}</td>
+                                                <td data-table="CONTRACTOR"  v-if="data.subcontractor_real.contract_withsubcontractor && data.subcontractor_real.contract_withsubcontractor.contractor" >{{data.subcontractor_real.contract_withsubcontractor.contractor.contractor_name}}</td>
                                                         
+                                                <td data-table="CONTRACTOR" v-else >unknown</td>
+
                                                         <td data-table="Delivery feedback" v-if=" data.subcontractor_real.closed !== '1'  "><span class="badge bg-warning border-0">BENDING</span></td>
                                                 <td data-table="Delivery feedback" v-if=" data.subcontractor_real.closed == '1'  "><span class="badge bg-success border-0">closed</span></td>
 
@@ -65,6 +69,7 @@ export
   <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
     <a class="dropdown-item" :href="'/managers/subcontractor_requestreturn/'+data.subcontractor_real.id">preview</a>
       <a class="dropdown-item" :href="'/managers/update_subcontractor/'+data.subcontractor_real.id">update</a>
+      <a class="dropdown-item"   href="#" @click="pay(data.subcontractor_real)"> forward to daily report</a>
     
     <a class="dropdown-item" @click="dele(data,index)"  href="#">delete</a>
 
@@ -142,8 +147,32 @@ allerros:[],
         },
 
         methods:{
+
+          pay(subcontractor){
+    
+    let formData = new FormData();
+ 
+ if(subcontractor.id){
+ formData.append('subcontractor_id', subcontractor.id);
+ }
+
+ formData.append('type','SI');
+
+
+
+
+ axios.post('/managers/report/daily/financial/insert',formData, {
+                 headers: {
+                     'Content-Type': 'multipart/form-data' },
+ })
+ .then(res=>{
+  window.$("#succ").modal("show");
+  })
+
+  },
+
    onImageChange(e,data) {   
-    console.log('hhhhhh')
+   
             this.images.splice(0)   
 this.images.push(e.target.files[0])
 

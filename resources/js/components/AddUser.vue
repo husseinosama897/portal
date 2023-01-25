@@ -7,11 +7,11 @@
                <div class="card-body">
                   <form method="POST"  v-on:submit.prevent="submit()" enctype="multipart/form-data">
                      <div class=" row mb-2">
-                        <label for="name" class="col-md-2 col-form-label text-md-right">Name</label>
+                        <label for="name" class="col-md-2 col-form-label text-md-right">frist name</label>
                         <div class="col-4">
                            <input id="name" v-model="first_name" type="text" class="form-control @error('name') " name="name"   autocomplete="name" autofocus>
                         </div>
-                               <label for="email" class="col-md-2 col-form-label text-md-right">fahther_name</label>
+                               <label for="email" class="col-md-2 col-form-label text-md-right">last name</label>
                         <div class="col-4">
                            <input id="email" type="text" class="form-control  " name="email" v-model="fahther_name"  >
                         </div>
@@ -44,18 +44,7 @@
 
                         </div>
 
-                        
-                        <div class=" row mb-2">
-                        <label for="vacations" class="col-md-2 col-form-label text-md-right">vacations</label>
-                        <div class="col-md-4">
-                           <input id="vacations" type="text" v-model="vacations" class="form-control @error('password') " name="password"  autocomplete="new-password">
-                        </div>
-                           <label for="weekly_vacation" class="col-md-2 col-form-label text-md-right">weekly_vacation</label>
-                        <div class="col-md-4">
-                           <input id="weekly_vacation" type="text" v-model="weekly_vacation" class="form-control @error('password') " name="password"  autocomplete="new-password">
-                        </div>
-
-                     </div>
+                  
 
                        
 
@@ -103,10 +92,7 @@
 
 
                          <div class=" row mb-2">
-                           <label for="email" class="col-md-2 col-form-label text-md-right">type_of_identity</label>
-                        <div class="col-md-4">
-                           <input id="email" type="text" class="form-control  " name="email" v-model="type_of_identity"  >
-                        </div>
+                  
 
 
      <label for="email" class="col-md-2 col-form-label text-md-right">identity number</label>
@@ -114,24 +100,15 @@
                            <input id="email" type="text" class="form-control  " name="email" v-model="identity"  >
                         </div>
 
-
-
-                        </div>
-                            <div class=" row mb-2">
-                           <label for="email" class="col-md-2 col-form-label text-md-right">identity_date</label>
+                        <label for="email" class="col-md-2 col-form-label text-md-right">identity_date</label>
                         <div class="col-md-4">
                            <input id="email" type="text" class="form-control  " name="email" v-model="identity_date"  >
                         </div>
 
 
-     <label for="email" class="col-md-2 col-form-label text-md-right">identity_source </label>
-                        <div class="col-md-4">
-                           <input id="email" type="text" class="form-control  " name="email" v-model="identity_source"  >
-                        </div>
-
-
 
                         </div>
+                  
 
                            <div class=" row mb-2">
                            <label for="email" class="col-md-2 col-form-label text-md-right">build_number</label>
@@ -140,30 +117,11 @@
                         </div>
 
 
-     <label for="email" class="col-md-2 col-form-label text-md-right">city </label>
-                        <div class="col-md-4">
-                           <input id="email" type="text" class="form-control  " name="email" v-model="city"  >
-                        </div>
-
+   
 
 
                         </div>
-                            <div class=" row mb-2">
-                           <label for="email" class="col-md-2 col-form-label text-md-right">street</label>
-                        <div class="col-md-4">
-                           <input id="email" type="text" class="form-control  " name="email" v-model="street"  >
-                        </div>
-
-
-     <label for="email" class="col-md-2 col-form-label text-md-right">phone </label>
-                        <div class="col-md-4">
-                           <input id="email" type="text" class="form-control  " name="email" v-model="phone"  >
-                        </div>
-
-
-
-                        </div>
-
+                      
 
                             <div class=" row mb-2">
                           <label for="name" class=" col-md-2 col-form-label text-md-right">salary per hour</label>
@@ -178,29 +136,7 @@
                      </div>
 
 
-                     <div class=" row mb-2">
-                          <label for="name" class=" col-md-2 col-form-label text-md-right">Communication_Allowance</label>
-                        <div class="col-md-4">
-                           <input id="name" v-model="Communication_Allowance" type="text" class="form-control @error('name') " name="name"   >
-                        </div>
-                          <label for="name" class="col-2 col-form-label text-md-right">Transportation_Allowance</label>
-                             <div class="col-md-4">
-                               
-                           <input id="name" v-model="Transportation_Allowance" type="text" class="form-control @error('name') " name="name"    >
-                        </div>
-                     </div>
-
-                     <div class=" row mb-2">
-                          <label for="name" class=" col-md-2 col-form-label text-md-right">Food_Allowance</label>
-                        <div class="col-md-4">
-                           <input id="name" v-model="Food_Allowance" type="text" class="form-control @error('name') " name="name"   >
-                        </div>
-                          <label for="name" class="col-2 col-form-label text-md-right"> Other_Allowance</label>
-                             <div class="col-md-4">
-                               
-                           <input id="name" v-model="Other_Allowance" type="text" class="form-control @error('name') " name="name"    >
-                        </div>
-                     </div>
+                  
 
                      <div class=" row mb-2">
                         <label for="password" class="col-md-2 col-form-label text-md-right">Password</label>
@@ -289,19 +225,28 @@
             </div>
          </div>
       </div>
-      <div id="deathEmployeeModal" class="modal fade bd-example" style="overflow:auto;">
-         <div class="modal-dialog ">
-            <div class="modal-content" style="overflow:auto;">
-               <div class="alert alert-danger" role="alert">
-                  <h4 class="alert-heading"> فشلت العمليه  !</h4>
-                  <p>    :  لقد فشلت العمليه للاسباب التاليه </p>
-                  <p v-for="(err,index)  in allerros" :key="index"> {{err}}</p>
-                  <hr>
-                  <input type="button" class="btn btn-dark" data-dismiss="modal" value="الغاء">
-               </div>
-            </div>
-         </div>
-      </div>
+  
+      
+     <div class="modal fade bd-example-modal-lg"  id="deathEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true" style="overflow-y: auto;"
+>
+ <div class="modal-dialog modal-lg">
+   <div class="modal-content"  
+     
+  >
+
+  <img src="/img/18915851.jpg" class="img-fluid" alt="Responsive image">
+
+  <div class="alert alert-danger" role="alert">
+                 <h4 class="alert-heading"> فشلت العمليه  !</h4>
+                 <p>    :  لقد فشلت العمليه للاسباب التاليه </p>
+                 <p v-for="(err,index)  in allerros" :key="index"> {{err}}</p>
+                 <hr>
+                 <input type="button" class="btn btn-dark" data-dismiss="modal" value="الغاء">
+              </div>
+   </div>
+ </div>
+</div>
+
    </div>
 </template>
 <script>
@@ -344,6 +289,7 @@ return{
 Communication_Allowance:'',
 Food_Allowance:'',
 Other_Allowance:'',
+allerros:[],
 first_name:'',
 laborer:'',
  vacations:'',
@@ -568,7 +514,23 @@ if(this.vacations){
 })
    .then(res=>{
           window.$("#editEmployeeModal").modal("show"); 
-
+          window.location.href = ('/managers/user/usertable')
+   
+    }).catch(error=>{
+ if (error.response.status == 422){
+     if(Array.isArray(error.response.data.errors)){
+         this.allerros = error.response.data.errors;
+     }else{
+         try {
+  this.allerros = JSON.parse(error.response.data.message);
+         }
+         catch{
+                this.allerros = error.response.data.errors;
+         }
+     }
+window.$("#deathEmployeeModal").modal("show"); 
+       
+      }
     })
 },
 

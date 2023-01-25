@@ -21,7 +21,8 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\CheckForMaintenanceMode::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
-  //      \App\Http\Middleware\ForceSSL::class,
+      // \App\Http\Middleware\ForceSSL::class,
+       
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
     ];
 
@@ -62,6 +63,7 @@ class Kernel extends HttpKernel
         'manager' => \App\Http\Middleware\manager::class,
         'user' => \App\Http\Middleware\User::class,
         'admin' => \App\Http\Middleware\admin::class,
+        'laborer' =>  \App\Http\Middleware\laborer::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,

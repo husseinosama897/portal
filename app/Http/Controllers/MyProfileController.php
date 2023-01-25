@@ -76,13 +76,13 @@ public function mytimesheet(){
     public function profile(){
 
    
-      $User = User::find(Auth::id())->withCount(['Attending_and_leaving as Absence'=> function ($query) {
+      $User = User::withCount(['Attending_and_leaving as Absence'=> function ($query) {
    return $query->where('absence','!=',null);
   }])
   ->with(['user_daily_report','user_file','task','personal_overall','role'])
   
   ->withsum('Attending_and_leaving','time_difference')
-  ->withsum('Attending_and_leaving','min')->with('contract')->first();
+  ->withsum('Attending_and_leaving','min')->with('contract')->find(auth()->user()->id);
   
   
   /*

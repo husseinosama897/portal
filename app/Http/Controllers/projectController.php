@@ -39,27 +39,60 @@ public function projectJson($project){
     
     
                     }])->withsum('subcontractor','total')->with(['contract'=>function($q){
-    
-                           $q->with(['user'=>function($query){
-    
-                              $query->with(['Attending_and_leaving'=>function($qe) {
-                   
-                                
-                                         }])->withsum('Attending_and_leaving','time_difference')->withsum('Attending_and_leaving','min');
-    
+            
+                        $q->with(['user'=>function($query){
+ 
+                          
 
-                                         $query = $query->withCount(['Attending_and_leaving as Absence'=> function ($query) {
-                                            return $query->where('absence','!=',null);
-                                           }]);
+                         $query->withSum(
+                            ['timesheet_project_personal' => function($q) {
+                      
+                     
+                      /*
+                      
+                              $from ='';
+                              $to ='';
+                            if($request->from){
+                              $from = date('m', strtotime($request->from));
+                            }
+                            if($request->to){
+                              $to = date('m', strtotime($request->to));
+                            }
+                             
+                            
+                              if($from){
+                                  $q->whereMonth('date','>=',$from);
+                              }
+                            
+                              if($to){
+                                $q->whereMonth('date','<=',$to);
+                            }
+                            
+                           
+                      
+                            
+                         
+                                  return $query;   
+                                  
+                      */
+                          }],
+                          'time'
+                        )
+                      
+                      ;
+
+                                      $query = $query->withCount(['Attending_and_leaving as Absence'=> function ($query) {
+                                         return $query->where('absence','!=',null);
+                                        }]);
 
 
-                                           return $query;
-                           }]);                 
-               
-    
-    return $q;
-    
-                      }])->withsum('invoice','total')->with('invoice')
+                                        return $query;
+                        }]);                 
+            
+ 
+ return $q;
+ 
+                   }])->withsum('invoice','total')->with('invoice')
       ->first();
     
     

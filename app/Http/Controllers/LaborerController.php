@@ -8,6 +8,10 @@ use App\contract;
 use Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use DatePeriod;
+use DateInterval;
+use DateTime;
+use Carbon\Carbon;
 class LaborerController extends Controller
 {
 
@@ -74,10 +78,6 @@ $User = $User->withCount(['Attending_and_leaving as Absence'=> function ($query)
     $data = User::query();
     $data = $data->WhereHas('contract',function($q){
 
-      $q->WhereHas('project',function($query){
-      
-      
-      });
       
       });
 
@@ -95,26 +95,25 @@ return $q->with('project');
         }
 
 
-        if($request->from){
-
-          $q->where('month','>=',date('m', strtotime($request->from)));
-           }
-
-           if($request->from){
-            $q->where('year','>=',date('y', strtotime($request->from)));
-             }
    
-
-             if($request->to){
-   
-              $q->where('month','<=',date('m', strtotime($request->to)));
-               }
-
-
-           if($request->to){
-   
-              $q->where('year','<=',date('y', strtotime($request->to)));
-               }
+        $from ='';
+        $to ='';
+      if($request->from){
+        $from = date('m', strtotime($request->from));
+      }
+      if($request->to){
+        $to = date('m', strtotime($request->to));
+      }
+       
+      
+        if($from){
+            $q->whereMonth('date','>=',$from);
+        }
+      
+        if($to){
+          $q->whereMonth('date','<=',$to);
+      }
+      
    
             return $q;   
             
@@ -126,35 +125,57 @@ return $q->with('project');
 ;
 
   }else{
+$data = $data->whereHas('personal_overall',function($q)use( $request){
+  
+  $from ='';
+  $to ='';
+if($request->from){
+  $from = date('m', strtotime($request->from));
+}
+if($request->to){
+  $to = date('m', strtotime($request->to));
+}
+ 
+
+  if($from){
+      $q->whereMonth('date','>=',$from);
+  }
+
+  if($to){
+    $q->whereMonth('date','<=',$to);
+}
+
+
+      return $q;   
+});
+
    $data=  $data->withSum(
-      ['timesheet_monthly_personal' => function($q) use($request){
+      ['personal_overall' => function($q) use($request){
 
 
-        if($request->project_id){
-          $q->where('project_id',$request->project_id);
+
+
+        $from ='';
+        $to ='';
+      if($request->from){
+        $from = date('m', strtotime($request->from));
+      }
+      if($request->to){
+        $to = date('m', strtotime($request->to));
+      }
+       
+      
+        if($from){
+            $q->whereMonth('date','>=',$from);
         }
+      
+        if($to){
+          $q->whereMonth('date','<=',$to);
+      }
+      
+      return $q;
 
-
-        if($request->from){
-
-          $q->where('month','>=',date('m', strtotime($request->from)));
-           }
-
-           if($request->from){
-            $q->where('year','>=',date('y', strtotime($request->from)));
-             }
-   
-
-             if($request->to){
-   
-              $q->where('month','<=',date('m', strtotime($request->to)));
-               }
-
-
-           if($request->to){
-   
-              $q->where('year','<=',date('y', strtotime($request->to)));
-               }
+      
    
             return $q;   
             
@@ -162,6 +183,46 @@ return $q->with('project');
     }],
     'time'
   )
+
+;
+
+$data=  $data->withSum(
+  ['personal_overall' => function($q) use($request){
+
+
+    if($request->project_id){
+      $q->where('project_id',$request->project_id);
+    }
+
+
+    $from ='';
+    $to ='';
+  if($request->from){
+    $from = date('m', strtotime($request->from));
+  }
+  if($request->to){
+    $to = date('m', strtotime($request->to));
+  }
+   
+  
+    if($from){
+        $q->whereMonth('date','>=',$from);
+    }
+  
+    if($to){
+      $q->whereMonth('date','<=',$to);
+  }
+  
+  return $q;
+
+  
+
+        return $q;   
+        
+
+}],
+'num_of_attendance'
+)
 
 ;
   }
@@ -175,9 +236,37 @@ if($request->name){
 }
     
 
+if($request->from){
+  $start =  Carbon::createFromFormat('Y-m-d',$request->from)->startOfMonth();
+
+}else{
+  $start = new DateTime(Carbon::now()->startOfMonth());
+
+  
+}
+
+if($request->to){
+  $end =  Carbon::createFromFormat('Y-m-d',$request->to);
+}else{
+  $end = new DateTime(Carbon::now()->format('Y-m-d'));
+}
+
+$interval = new DateInterval('P1D');
+$daterange = new DatePeriod($start, $interval ,$end);
+
+$weekends = 0;
+
+foreach($daterange as $date){
+    $days = $date->format('D');
+    if ($days == 'Fri') { # we set friday
+        $weekends++;
+    }
+}
+
+
   $data =   $data->paginate(10);
   
-    return response()->json(['data'=>$data]);
+    return response()->json(['data'=>$data,'weekends'=>$weekends]);
   }
 
 

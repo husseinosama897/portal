@@ -9,6 +9,8 @@ use DatePeriod;
 use DateInterval;
 use DateTime;
 use Carbon\Carbon;
+use App\Attending_and_leaving;
+use Illuminate\Support\Str;
 class HRController extends Controller
 {
     //
@@ -105,7 +107,93 @@ $points = ($increment * rand(7,9));
 
     return view('managers.report.hr.profile')->with(['data'=>$User]);
 }
-    
+   
+public function attendancejson(request $request){
 
+    $this->validate($request,[
+        'date'=>['date'],       
+'name'=>['string','max:255'],
+'supervisor'=>['string','max:255'],
+'project'=>['string','max:255'],
+    ]);
+
+    $data = Attending_and_leaving::query();
+    
+if($request->date){
+    $data = $data->whereDate('attending_time',$request->date);
+
+}else{
+    $data = $data->whereDate('attending_time',\DB::raw('CURDATE()'));
+}
+
+if($request->name){
+$data = $data->whereHas('user',function($q)use($request){
+
+if($request->name){
+
+ $q->where('name', 'LIKE', '%' . $request->name . '%');
+  
+  
+
+}
+
+return $q;
+
+});
+}
+if($request->supervisor){
+$data = $data->whereHas('scanned',function($q)use($request){
+
+    if($request->supervisor){
+     
+        $q->where('name', 'LIKE', '%' . $request->supervisor . '%');
+  
+  
+    }
+    
+    return $q;
+    
+    });
+
+}
+    $data = $data->with(['scanned'=>function($q){
+        $q->select(['id','name']);
+    },'user'=>function($q){
+
+
+        $q->select(['id','name'])->with(['contract'=>function($query){
+
+            $query->select(['id','project_id','user_id'])->with(['project'=>function($q){
+                $q->select(['id','name']);
+            }]);
+        }]);
+        
+       
+    }]);
+
+
+$data = $data->paginate(10);
+
+return response()->json(['data'=>$data]);
+  
+}
+public function attendancetoday(){
+    return view('managers.report.hr.attendance');
+}
+
+
+
+public function card( $User){
+if(is_numeric($User)){
+
+
+
+    $data = User::with(['role','contract'])->find($User);
+
+return view('managers.report.hr.card')->with(['data'=>$data]);
+
+}
+
+}
 
 }

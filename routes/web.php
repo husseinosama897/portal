@@ -7,6 +7,8 @@ use App\Jobs\qremail;
 use Illuminate\Support\Str;
 use App\Events\NotificationEvent;
 
+use App\Http\Middleware\laborer;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,158 +21,37 @@ use App\Events\NotificationEvent;
 */
 
 
-// ------------------------- * * * User profile * * * ---------------------------------
 
-Route::group(['prefix'=>'profile'],function(){
+Route::group(['prefix'=>'suppliersystem'],function(){
 
-Route::get('/timesheet','MyProfileController@mytimesheet')->name('mytimesheet');
-Route::post('/jsontimesheet','MyProfileController@jsontimesheet');
-
-Route::get('/','MyProfileController@profile')->name('my.profile');
+    Route::get('/', 'suppliersystemController@index')->name('suppliersystem.index');
 
 
+    Route::get('/update', 'suppliersystemController@update')->name('suppliersystem.update');
+
+
+    Route::get('/print', 'suppliersystemController@print')->name('suppliersystem.print');
+
+
+    Route::post('/json', 'suppliersystemController@json')->name('suppliersystem.json');
+
+
+    
 });
 
-//---------------------------** Suppliers ** -----------------------------------
-
-Route::post('/getselectboxsupp', 'usersupplierController@getselectboxsupp')->name('user.getselectboxsupp');
-Route::get('/createsupplier', 'usersupplierController@createpage')->name('user.createpage');
-Route::get('/supplierselex', 'usersupplierController@supplierselex')->name('user.supplierselex');
-Route::get('/suppilercount', 'usersupplierController@suppilercount')->name('user.suppilercount');
-
-Route::post('/createsupp', 'usersupplierController@createsupp')->name('user.createsupp');
-
-Route::get('/suppliertable', 'usersupplierController@suppliertable')->name('user.suppliertable');
-
-Route::get('/supplierjson', 'usersupplierController@supplierjson')->name('user.supplierjson');
-
-Route::post('/updatesupp/{supplier}', 'usersupplierController@updatesupp')->name('user.updatesupp');
-
-//---------------------------------** ends of suppliers ** --------------------------------
 
 
-
-// ----------------------- pricing supplier -----------------------------------
-
-
-Route::get('/pricing_supplierindex', 'pricing_supplierController@index')->name('pricing_supplierindex');
-
-Route::get('/pricing_suppliercreate', 'pricing_supplierController@create')->name('pricing_suppliercreate');
-
-Route::get('/pricing_supplierjson', 'pricing_supplierController@pricing_supplierjson')->name('pricing_supplierjson');
-
-Route::POST('/pricing_supplierselect', 'pricing_supplierController@pricing_supplierselect')->name('pricing_supplierselect');
-
-Route::post('/pricing_supplierinsert', 'pricing_supplierController@insert')->name('pricing_supplierinsert');
-
-
-Route::post('/pricing_supplierdelete/{ids}', 'pricing_supplierController@delete')->name('pricing_supplierdelete');
-
-
-Route::post('/pricing_supplierupdate/{pricing_supplier}', 'pricing_supplierController@update')->name('pricing_supplierupdate');
-
-
-Route::get('/pricing_supplierpreview/{pricing_supplier}', 'pricing_supplierController@preview')->name('pricing_supplierpreview');
-
-
-Route::post('/pricing_suppliersAutoComplete', 'pricing_supplierController@pricing_suppliersAutoComplete')->name('pricing_suppliersAutoComplete');
-
-Route::post('/getricingdetails/{pricing_supplier}', 'pricing_supplierController@getricingdetails')->name('getricingdetails');
-
-
-Route::get('/pricing_supplieredit/{pricing_supplier}', 'pricing_supplierController@edit')->name('pricing_supplieredit');
 
 
 //------------------------------- staff attendance ** ----------------------- 
 
-Route::get('/testfile/{project}', 'LaborerattendingController@Attending_and_leaving')->name('laborer.Attending_and_leaving');
-
-
-//--------------------------------------* * employee_by_role * ** -----------------------------
-
-
-Route::get('/employee_by_role/{role}', 'userController@employee_by_role')->name('user.employee_by_role');
-
-
-//-----------------------------------   ** role **    ------------------------------------------
-
-
-Route::get('/rolechunk', 'RoleController@rolechunk')->name('role.rolechunk');
-
-//-------------------------------------------------------------------------------
-
-
-
-Route::get('/start_day', 'LaborerattendingController@start_day')->name('laborer.start_day');
+Route::get('/testfile/{User}', 'LaborerattendingController@Attending_and_leaving')->name('laborer.Attending_and_leaving');
 
 
 
 
-Route::group(['prefix'=>'service'],function(){
-    #create page
-Route::get('/create','serviceController@create')->name('user.service.create');
 
 
-Route::get('/index','serviceController@index')->name('user.service.index');
-
-Route::get('/preview/{service}','serviceController@preview')->name('user.service.preview');
-
-
-Route::get('/edit/{service}','serviceController@edit')->name('user.service.edit');
-
-
-Route::post('/update/{service}','serviceController@update')->name('user.service.update');
-
-
-Route::get('/preview2','serviceController@preview2')->name('user.service.preview2');
-
-
-Route::post('/insert','serviceController@insrting')->name('user.service.insert');
-
-
-Route::post('/delete/{service}','serviceController@delete')->name('user.service.json');
-
-
-Route::post('/json','serviceController@json')->name('user.service.json');
-
-});
-
-
-
-// ---------------------------- * * *  JobOffer * * * ------------------------------
-
-
-
-Route::group(['prefix'=>'joboffer'],function(){
-    #create page
-Route::get('/create','JobOfferController@create')->name('user.joboffer.create');
-
-
-Route::get('/index','JobOfferController@index')->name('user.joboffer.index');
-
-Route::get('/preview/{joboffer}','JobOfferController@preview')->name('user.joboffer.preview');
-
-Route::get('/update/{joboffer}','JobOfferController@update')->name('user.joboffer.update');
-
-Route::post('/updating/{joboffer}','JobOfferController@action')->name('user.joboffer.action');
-
-
-Route::get('/preview2','JobOfferController@preview2')->name('user.joboffer.preview2');
-
-
-Route::post('/insert','JobOfferController@insert')->name('user.joboffer.insert');
-
-
-Route::post('/json','JobOfferController@json')->name('user.joboffer.json');
-
-});
-
-
-
-
-Route::get('/qremail','qrController@qr')->name('qr');
-
-Route::get('qr/{num}','qrController@find')->name('find.qr');
 
 
 
@@ -194,6 +75,8 @@ Route::get('/', function () {
     echo $saturdays;
     */
 
+
+
     return view('welcome');
 })->name('start');
 
@@ -204,10 +87,217 @@ Route::get('/', function () {
 
 Auth::routes();
 
+
+
+
+Route::middleware([laborer::class])->group(function () {
+
+// ------------------------- * * * User profile * * * ---------------------------------
+
+Route::group(['prefix'=>'profile'],function(){
+
+    Route::get('/timesheet','MyProfileController@mytimesheet')->name('mytimesheet');
+
+    Route::post('/jsontimesheet','MyProfileController@jsontimesheet');
+    
+    Route::get('/','MyProfileController@profile')->name('my.profile');
+    
+    
+    });
+    
+    //---------------------------** Suppliers ** -----------------------------------
+    
+    Route::post('/getselectboxsupp', 'usersupplierController@getselectboxsupp')->name('user.getselectboxsupp');
+    Route::get('/createsupplier', 'usersupplierController@createpage')->name('user.createpage');
+    Route::get('/supplierselex', 'usersupplierController@supplierselex')->name('user.supplierselex');
+    Route::get('/suppilercount', 'usersupplierController@suppilercount')->name('user.suppilercount');
+    
+    Route::post('/createsupp', 'usersupplierController@createsupp')->name('user.createsupp');
+    
+    Route::get('/suppliertable', 'usersupplierController@suppliertable')->name('user.suppliertable');
+    
+    Route::get('/supplierjson', 'usersupplierController@supplierjson')->name('user.supplierjson');
+    
+    Route::post('/updatesupp/{supplier}', 'usersupplierController@updatesupp')->name('user.updatesupp');
+    
+    //---------------------------------** ends of suppliers ** --------------------------------
+    
+    
+    
+    // ----------------------- pricing supplier -----------------------------------
+    
+    
+    Route::get('/pricing_supplierindex', 'pricing_supplierController@index')->name('pricing_supplierindex');
+    
+    Route::get('/pricing_suppliercreate', 'pricing_supplierController@create')->name('pricing_suppliercreate');
+    
+    Route::get('/pricing_supplierjson', 'pricing_supplierController@pricing_supplierjson')->name('pricing_supplierjson');
+    
+    Route::POST('/pricing_supplierselect', 'pricing_supplierController@pricing_supplierselect')->name('pricing_supplierselect');
+    
+    Route::post('/pricing_supplierinsert', 'pricing_supplierController@insert')->name('pricing_supplierinsert');
+    
+    
+    Route::post('/pricing_supplierdelete/{ids}', 'pricing_supplierController@delete')->name('pricing_supplierdelete');
+    
+    
+    Route::post('/pricing_supplierupdate/{pricing_supplier}', 'pricing_supplierController@update')->name('pricing_supplierupdate');
+    
+    
+    Route::get('/pricing_supplierpreview/{pricing_supplier}', 'pricing_supplierController@preview')->name('pricing_supplierpreview');
+    
+    
+    Route::post('/pricing_suppliersAutoComplete', 'pricing_supplierController@pricing_suppliersAutoComplete')->name('pricing_suppliersAutoComplete');
+    
+    Route::post('/getricingdetails/{pricing_supplier}', 'pricing_supplierController@getricingdetails')->name('getricingdetails');
+    
+    
+    Route::get('/pricing_supplieredit/{pricing_supplier}', 'pricing_supplierController@edit')->name('pricing_supplieredit');
+    
+    
+    
+    //--------------------------------------* * employee_by_role * ** -----------------------------
+    
+    
+    Route::get('/employee_by_role/{role}', 'userController@employee_by_role')->name('user.employee_by_role');
+    
+    
+    //-----------------------------------   ** role **    ------------------------------------------
+    
+    
+    Route::get('/rolechunk', 'RoleController@rolechunk')->name('role.rolechunk');
+    
+    //-------------------------------------------------------------------------------
+    
+    
+    
+    Route::get('/start_day', 'LaborerattendingController@start_day')->name('laborer.start_day');
+    
+    
+    
+    
+    Route::group(['prefix'=>'service'],function(){
+        #create page
+    Route::get('/create','serviceController@create')->name('user.service.create');
+    
+    
+    Route::get('/index','serviceController@index')->name('user.service.index');
+    
+    Route::get('/preview/{service}','serviceController@preview')->name('user.service.preview');
+    
+    
+    Route::get('/edit/{service}','serviceController@edit')->name('user.service.edit');
+    
+    
+    Route::post('/update/{service}','serviceController@update')->name('user.service.update');
+    
+    
+    Route::get('/preview2','serviceController@preview2')->name('user.service.preview2');
+    
+    
+    Route::post('/insert','serviceController@insrting')->name('user.service.insert');
+    
+    
+    Route::post('/delete/{service}','serviceController@delete')->name('user.service.json');
+    
+    
+    Route::post('/json','serviceController@json')->name('user.service.json');
+    
+    });
+    
+    
+    
+    // ---------------------------- * * *  JobOffer * * * ------------------------------
+    
+    
+    
+    Route::group(['prefix'=>'joboffer'],function(){
+        #create page
+    Route::get('/create','JobOfferController@create')->name('user.joboffer.create');
+    
+    
+    Route::get('/index','JobOfferController@index')->name('user.joboffer.index');
+    
+    Route::get('/preview/{joboffer}','JobOfferController@preview')->name('user.joboffer.preview');
+    
+    Route::get('/update/{joboffer}','JobOfferController@update')->name('user.joboffer.update');
+    
+    Route::post('/updating/{joboffer}','JobOfferController@action')->name('user.joboffer.action');
+    
+    
+    Route::get('/preview2','JobOfferController@preview2')->name('user.joboffer.preview2');
+    
+    
+    Route::post('/insert','JobOfferController@insert')->name('user.joboffer.insert');
+    
+    
+    Route::post('/json','JobOfferController@json')->name('user.joboffer.json');
+    
+    });
+    
+    
+    
+    
+    Route::get('/qremail','qrController@qr')->name('qr');
+    
+    Route::get('qr/{num}','qrController@find')->name('find.qr');
+    
+    
+
+Route::group(['prefix'=>'tender'],function(){
+
+    Route::get('/', 'tenderController@index')->name('tender.index');
+
+    Route::get('/update/{marketing}', 'tenderController@update')->name('tender.update');
+
+    Route::post('/response/{marketing}', 'tenderController@responses')->name('tender.response');
+
+    
+    Route::post('/json', 'tenderController@json')->name('tender.json');
+
+});
+
+Route::group(['prefix'=>'marketing'],function(){
+
+    Route::get('/create', 'marketingController@create')->name('marketing.create.user');
+
+    Route::post('/add', 'marketingController@add')->name('marketing.add.user');
+
+    Route::post('/json', 'marketingController@json')->name('marketing.json.user');
+
+    Route::post('/delete/{marketing}', 'marketingController@delete')->name('marketing.delete.user');
+
+
+    Route::get('/', 'marketingController@index')->name('marketing.index.user');
+
+    Route::get('/edit/{marketing}', 'marketingController@edit')->name('marketing.edit.user');
+   
+    Route::post('/update/{marketing}', 'marketingController@update')->name('marketing.update.user');
+
+
+});
+
+
 // -----------------------  project manager * * * -----------------------------------
 Route::group(['prefix'=>'project_manager'],function(){
 
 
+    Route::group(['prefix'=>'laborer'],function(){
+
+        Route::get('/create', 'projectManagerController@create_laborer')->name('projectmanager.create_laborer');
+
+        Route::get('/edit/{User}', 'projectManagerController@edit_laborer')->name('projectmanager.edit_laborer');
+
+        Route::get('/', 'projectManagerController@index_laborer')->name('projectmanager.index_laborer');
+
+        Route::post('/json', 'projectManagerController@json_laborer')->name('projectmanager.json_laborer');
+
+        Route::post('/add', 'projectManagerController@add_laborer')->name('projectmanager.add_laborer');
+
+        Route::post('/update/{User}', 'projectManagerController@update_laborer')->name('projectmanager.update_laborer');
+
+
+    });
     
 
     Route::group(['prefix'=>'attendance'],function(){
@@ -219,6 +309,10 @@ Route::group(['prefix'=>'project_manager'],function(){
     });
 
 
+
+
+
+    
     Route::group(['prefix'=>'report'],function(){
         Route::get('/summary', 'projectManagerController@projectstimesheetPage')->name('projectmanager.projectstimesheetPage');
 
@@ -680,13 +774,48 @@ Route::post('/updatecontractor/{contractor}', 'contractorController@updatecontra
 
 
 
+///------------------------------- section --------------------------------------
+Route::group(['prefix'=>'department'],function(){
 
+    Route::get('/','sectionController@index')->name('section.index');
+    
+    Route::get('/edit/{section}','sectionController@edit')->name('section.edit');
+    
+    Route::post('/json','sectionController@json')->name('section.json');
+    
+    Route::post('/insert','sectionController@insert')->name('section.insert');
+    
+    Route::post('/update/{section}','sectionController@update')->name('section.update');
+ 
+
+    
+    });
 
 // ------------------------------- * * * HR * * * ---------------------------------------------
 
 Route::group(['prefix'=>'HR'],function(){
 
 Route::get('/profile/{User}','HRController@profile')->name('profile');
+
+Route::get('/card/{User}','HRController@card')->name('card');
+
+
+
+
+
+
+
+
+
+Route::group(['prefix'=>'attendance'],function(){
+
+Route::get('/','HRController@attendancetoday')->name('attendancetoday');
+
+
+Route::post('/json','HRController@attendancejson')->name('attendancejson');
+
+
+});
 
 });
 
@@ -743,6 +872,82 @@ Route::post('/stockJson/{project}', 'reportController@stock')->name('stockJson')
 
 Route::post('/project_search', 'reportController@project_search')->name('project_search');
 
+
+
+Route::group(['prefix'=>'daily'] ,  function(){
+
+    Route::group(['prefix'=>'financial'] ,  function(){
+
+Route::get('/update/{financial_daily_report}', 'financialController@update')->name('daily.financial_create');
+  
+Route::get('/preview/{financial_daily_report}', 'financialController@preview')->name('daily.financial_preview');
+  
+
+
+Route::get('/', 'financialController@index')->name('daily.financial_index');
+  
+
+Route::post('/insert', 'financialController@insert')->name('daily.financial_insert');
+  
+
+Route::post('/confirm/{financial_daily_report}', 'financialController@confirm')->name('daily.financial_confirm');
+  
+
+Route::post('/json', 'financialController@json')->name('daily.financial_json');
+  
+
+});
+});
+
+
+
+
+Route::group(['prefix'=>'department'] ,  function(){
+
+    
+
+
+    Route::group(['prefix'=>'tender'] ,  function(){
+
+        Route::post('/json', 'reportController@tenderjson')->name('tenderjson');
+
+        Route::get('/', 'reportController@tenderpage')->name('tenderpage.report');
+
+    });
+
+
+
+
+    Route::group(['prefix'=>'marketing'] ,  function(){
+
+        Route::post('/json', 'reportController@marketingjson')->name('marketingjson');
+
+        Route::get('/', 'reportController@marketingpage')->name('marketingpage.report');
+
+    });
+
+
+
+
+    Route::group(['prefix'=>'procurement'] ,  function(){
+
+        Route::post('/json', 'reportController@procurementjson')->name('procurementjson');
+
+        Route::get('/', 'reportController@procurementpage')->name('procurementpage');
+
+    });
+
+
+
+    Route::group(['prefix'=>'construction'] ,  function(){
+
+        Route::post('/json', 'reportController@jsonconstruction')->name('jsonconstruction');
+
+        Route::get('/', 'reportController@construction')->name('construction');
+
+    });
+
+});
 
 
 
@@ -858,6 +1063,8 @@ Route::post('/attendance/{User}', 'LaborerattendingController@attendance')->name
 Route::get('/user/usertable', 'userController@usertable')->name('user.usertable');
 
 Route::post('/user/jsonUser', 'userController@jsonUser')->name('user.jsonUser');
+
+Route::post('/user/{User}', 'userController@delete')->name('user.delete');
 
 
 
@@ -1220,7 +1427,18 @@ Route::post('/createacreateccountbank', 'accountbankController@create')->name('c
 Route::group(['prefix'=>'role'],function(){
 
  Route::post('/insert', 'RoleController@insert')->name('role.insert');
+
+ Route::post('/json', 'RoleController@json')->name('role.json');
+
+
+ Route::get('/', 'RoleController@index')->name('index.role');
+
+
  Route::get('/create', 'RoleController@create')->name('role.create');
+
+ Route::get('/edit/{role}', 'RoleController@edit')->name('role.edit');
+
+ Route::post('/update/{role}', 'RoleController@update')->name('role.update');
 
 });
 
@@ -1511,5 +1729,6 @@ Route::post('/returnjsonpurchase', 'managerpurchaseController@returnjsonpurchase
 Route::get('/purchase_orderreturn/{purchase_order}', 'managerpurchaseController@purchasereturn')->name('managers.purchase_order');
 
 
+});
 
 });

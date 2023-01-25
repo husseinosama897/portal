@@ -73,7 +73,7 @@ export
                                                 <th><strong>DESCRIPTION</strong></th>
                                                       
         <th><strong>Delivery feedback</strong></th>
-                                               <th><strong>Attachment</strong></th>
+                                            
 
                                                 <th><strong>STATUS</strong></th>
                                                 <th><strong>VAT</strong></th>
@@ -91,10 +91,7 @@ export
                         <td data-table="Delivery feedback" v-if=" data.petty_cash.closed !== '1'  "><span class="badge bg-warning border-0">BENDING</span></td>
                                                 <td data-table="Delivery feedback" v-if=" data.petty_cash.closed == '1'  "><span class="badge bg-success border-0">closed</span></td>
 
-                                                        <td data-table="Attachment" > 
-                                                             <input type="file" v-if="data.petty_cash.closed !== '1'   "   v-on:change="onImageChange($event,data.petty_cash)" >
-                                                      
-                                                    </td>
+                                               
 
                                                 <td data-table="STATUS" v-if="data.status == 2"><span class="badge bg-danger border-0" >REJECTED</span></td>
                                                 <td data-table="STATUS"  v-if="data.status == 1"><span class="badge bg-success border-0">ACCEPTED</span></td>
@@ -114,7 +111,8 @@ export
       <a class="dropdown-item" :href="'/managers/update_petty_cash/'+data.petty_cash.id">update</a>
     
     <a class="dropdown-item" @click="dele(data,index)"  href="#">delete</a>
-
+    <a class="dropdown-item"   href="#" @click="pay(data.petty_cash)"> forward to daily report</a>
+    
   </div>
 </div>
 												</td>
@@ -160,6 +158,29 @@ ref:'',
         },
 
         methods:{
+
+          pay(petty_cash){
+    
+    let formData = new FormData();
+
+
+ if(petty_cash.id){
+ formData.append('petty_cash_id', petty_cash.id);
+ }
+
+ formData.append('type','PC');
+
+
+ axios.post('/managers/report/daily/financial/insert',formData, {
+                 headers: {
+                     'Content-Type': 'multipart/form-data' },
+ })
+ .then(res=>{
+  window.$("#succ").modal("show");
+  })
+
+  },
+
           user(){
     
     axios({

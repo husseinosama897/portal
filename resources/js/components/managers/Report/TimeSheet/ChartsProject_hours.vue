@@ -83,8 +83,8 @@ this.data = this.data2
   this.data.forEach(e=>{
    
         if(e.time_attendance !== null && e.time_attendance >= 0 ){
-         
-        this.series[0].data.push(e.time_attendance)
+         var time = (e.time_attendance / 60)
+        this.series[0].data.push( time.toFixed(2))
         console.log(this.series[0].data)
       }else{
         this.series[0].data.push(0)

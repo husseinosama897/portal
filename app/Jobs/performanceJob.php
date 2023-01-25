@@ -13,7 +13,7 @@ use App\performance_daily_project;
 use App\performance_daily_section;
 use App\performance_monthly_personal;
 use App\performance_monthly_project;
-use App\performance_monthly_section;
+use App\monthly_section;
 use App\performance_project_personal;
 use App\performance_section_personal;
 use App\project_overall;
@@ -43,7 +43,10 @@ class performanceJob implements ShouldQueue
      */
     public function handle()
     {
+
+        $user = User::find($this->user)->with('contract');
         
+      
 
         
         $start = new DateTime(Carbon::now()->startOfMonth());
@@ -66,19 +69,32 @@ class performanceJob implements ShouldQueue
 
         $diff = $st2->diffInDays(Carbon::parse($st1));
 
+if($this->project){
+    $number =  $user->contract->project()->count();
 
-        $number = 10;
+}elseif($this->section){
+$number =   $user->role->section()->count();
+}else{
+    $number = 0;
+}
+      
+      
+        
+   
 
 $days_without_weekends = ($diff - $saturdays  );
    
+
+$numbers_util_now = 1  * $days_without_weekends * 10;
+   
+$increment = $this->performance  * 100  / $numbers_util_now ;
+
+
+
      if($this->project == null){
 
     
         $project_overall = project_overall::where(['date'=>Carbon::now()->startOfMonth(),'project_id'=>$this->project])->first();
-
-        $numbers_util_now = $number  * $days_without_weekends * 10;
-   
-        $increment = $this->performance  * 100  / $numbers_util_now ;
 
 if($project_overall){
     $old =  $performance_monthly_project->num_of_performers * $numbers_util_now / 100 ;
@@ -110,6 +126,7 @@ if($project_overall){
         'num_of_performers'=>1,
         'num_of_attendance'=>0,
 'time_attendance'=>0,
+
         'percentage_attendance'=>0
     ]);
 }
@@ -126,10 +143,6 @@ if($project_overall){
 
      if($this->user == null){
         $performance_monthly_personal = personal_overall::where(['date'=>Carbon::now()->startOfMonth(),'user_id'=>$this->user])->first();
-
-        $numbers_util_now = 1  * $days_without_weekends * 10;
-   
-        $increment = $this->performance  * 100  / $numbers_util_now ;
 
 
 
@@ -157,8 +170,12 @@ if($project_overall){
                 'num_of_performers'=>1,
                 'num_of_attendance'=>0,
                 'time'=>0,
+                'marketing_project'=>0,
+                'cost_reduction'=>0,
                 'percentage_performance'=>$increment,
                 'percentage_attendance'=>0,
+                'percentage_section'=>0,
+                'marketing'=>0
             ]);
         }
         
@@ -166,15 +183,39 @@ if($project_overall){
 
 
      if($this->section == null){
-        $performance_monthly_section = performance_monthly_section::where(['date'=>Carbon::now()->startOfMonth(),'section_id'=>$this->section])->first();
+        $monthly_section = monthly_section::where(['date'=>Carbon::now()->startOfMonth(),'section_id'=>$this->section])->first();
 
-        if($performance_monthly_section){
-            $performance_monthly_section->increment('point',$this->performance);
+        
+        if($monthly_section){
+            $old =  $monthly_section->num_of_performers * $numbers_util_now / 100 ;
+            
+            $monthly_section->increment('point',$this->performance);
+           
+            $monthly_section->increment('percentage_performance',($old + $increment));
+           
+            $monthly_section->increment('num_of_performers',1);
+           
+
         }else{
-            performance_monthly_section::create([
+            monthly_section::create([
                 'date'=>Carbon::now()->startOfMonth(),
                 'point'=>$this->performance ?? 0,
-                'section_id'=>$this->section
+                'section_id'=>$this->section,
+                'percentage_attendance'=>0,
+                'num_of_attendance'=>0,
+                'percentage_performance'=>$increment,
+                'saving_percentage'=>0,
+
+
+                'marketing_project'=>0,
+                'percentage_marketing_project'=>0,
+                'percentage_deal'=>0,
+                'num_deal'=>0,
+                
+
+                'cost_reduction'=>0,
+                'num_of_performers'=>1,
+                      'time'=>0
             ]);
         }
         

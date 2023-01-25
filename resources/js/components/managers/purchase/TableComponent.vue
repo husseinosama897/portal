@@ -12,9 +12,15 @@
 
 <div class="col-4">
   <label for="password" class="form-label">
-   date 
+   from 
   </label>
-  <input type="date" class="form-control input-default " v-model="date" placeholder="to">
+  <input type="date" class="form-control input-default " v-model="from" placeholder="to">
+</div>
+<div class="col-4">
+  <label for="password" class="form-label">
+   to
+  </label>
+  <input type="date" class="form-control input-default " v-model="to" placeholder="to">
 </div>
 
 <div class="col-4">
@@ -48,10 +54,14 @@
   <label for="password" class="form-label">
     suppliers  
   </label>
-  <select  class="form-select select2" v-model="supplier_id">
-    <option ></option>
-  <option v-for="supplier in suppliers" :value="supplier.id" :key="supplier.id">{{supplier.comp ? supplier.comp : supplier.customer_name}}</option>
-  </select>
+
+  <input @input="supplier_autocomplete"   v-model="supplier_x.name" class="form-control">
+
+
+  <ul  v-if="supplierList.length > 0" class="list-group">
+                                 <li class="list-group-item" @click="takesupplierList(supplier)" v-for="supplier in supplierList"  :key="supplier.id" >{{supplier.comp ? supplier.comp : supplier.supplier_name}}</li>
+                              </ul>
+
 </div>
 
 </div>
@@ -91,7 +101,7 @@ export
                                                  <th><strong>Delivery date</strong></th>
                                              
                                                <th><strong>Delivery feedback</strong></th>
-                                               <th><strong>Attachment</strong></th>
+                                       
                                              
                                              
 
@@ -127,10 +137,6 @@ export
    undefined
    </td>
 
-   <td data-table="Attachment"  v-if="data.purchase_order.closed !== '1'   " >  
-      <input type="file"    v-on:change="onImageChange($event,data.purchase_order)" >
-                                                      
-                                                    </td>
 
 
                                                  <td data-table="STATUS" v-if="data.status == 2">
@@ -150,6 +156,8 @@ export
   <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
     <a class="dropdown-item" :href="'/managers/purchase_orderreturn/'+data.purchase_order.id">preview</a>
       <a class="dropdown-item" :href="'/managers/update_purchase_order/'+data.purchase_order.id">update</a>
+    
+      <a class="dropdown-item"   href="#" @click="pay(data.purchase_order)"> forward to daily report</a>
     
   
   </div>
@@ -172,6 +180,21 @@ export
          
       
                 </div>
+
+
+
+                <div class="modal fade bd-example-modal-lg"  id="preview" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <img src="/Tiny.jpg" class="img-fluid" alt="Responsive image">
+
+    </div>
+  </div>
+</div>
+				
+    
+
+
               </div>
 
 </template>
@@ -188,21 +211,69 @@ datas:{},
 images:[],
 allerros:[],
 today:'',
+purchase_payment:{},
 ref:'',
-date:'',
+from:'',
+supplierList:[],
+to:'',
 delivery_date:'',
+accountt:{name:'الحساب الرئيسي'},
 projects:[],
 suppliers:[],
-supplier_id:'',
+
+total:'',
 users:[],
 user_id:'',
 project_id:'',
+level:'',
+capital_array:[],
+supplier_x:{},
+supplier_id:'',
 }
 
         },
 
         methods:{
           
+
+          takesupplierList(supplier_prameter){
+this.supplier_id = supplier_prameter.id
+this.supplier_x.name = supplier_prameter.comp ? supplier_prameter.comp  : supplier_prameter.supplier_name
+this.supplierList.splice(0)
+          },
+supplier_autocomplete(){
+this.supplier_id = ''
+  axios({
+	method:'post',
+	'url':'/managers/getselectboxsupp'
+  ,
+  data:{
+name:this.supplier_x.name
+    }
+}).then(res=>{
+    this.supplierList = res.data.data
+  })
+
+},
+          updateaccount2(acc){
+this.accountt = {}
+
+this.accountt  = acc
+
+
+
+},
+
+capital(){
+axios({
+	method:'get',
+	'url':'/managers/moneycapitalsaccount'
+}).then(res=>{
+
+	this.capital_array = res.data.data
+})
+},
+
           supplier(){
     
     axios({
@@ -234,6 +305,32 @@ project_id:'',
            
     
     })
+    },
+
+    pay(purchase){
+    
+      let formData = new FormData();
+      if(purchase.supplier_id){
+   formData.append('supplier_id', purchase.supplier_id);
+   }
+
+   if(purchase.id){
+   formData.append('purchase_order_id', purchase.id);
+   }
+
+   formData.append('type','PO');
+
+
+
+
+   axios.post('/managers/report/daily/financial/insert',formData, {
+                   headers: {
+                       'Content-Type': 'multipart/form-data' },
+   })
+   .then(res=>{
+    window.$("#succ").modal("show");
+    })
+
     },
 
           user(){
@@ -292,35 +389,12 @@ let vm = []
     
     })
     },
-
-     onImageChange(e,data) {   
+    onImageChange(e,data) {   
             this.images.splice(0)   
 this.images.push(e.target.files[0])
 
-   let formData = new FormData();
-
-if(this.images){
-	 formData.append('count', this.images.length);
-}
-
-this.images.forEach((element, index, array) => {
-	if(element !== undefined){
- formData.append('files-' + index, element);
-	}
-     
-    });
-
- axios.post('/managers/action_purchase_order_inv/'+data.id,formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data' },
-})
-.then(res=>{
-Vue.set(data,'closed',1)
-     })
-
-
-            },
-
+    },
+ 
 dele(data,index){
 
       if(confirm("Do you really want to delete?")){
@@ -336,18 +410,34 @@ this.datas.data.splice(index,1)
       }
 },
     getResults(page = 1) {
-		axios({
-  method: 'post',
-  url: '/managers/returnjsonpurchase?page=' + page,
-  data:{
-  ref:this.ref,
-date:this.date,
-delivery_date:this.delivery_date, 
-project_id:this.project_id,
-user_id:this.user_id,
-supplier_id:this.supplier_id
+
+      
+      let formData = new FormData();
+
+if(this.project_id){
+	 formData.append('project_id', this.project_id);
 }
-})		.then(response => {
+
+if(this.supplier_id){
+	 formData.append('supplier_id', this.supplier_id);
+}
+if(this.delivery_date){
+	 formData.append('delivery_date', this.delivery_date);
+}
+
+if(this.ref){
+	 formData.append('ref', this.ref);
+}
+
+if(this.user_id){
+	 formData.append('user_id', this.user_id);
+}
+
+
+axios.post('/managers/returnjsonpurchase?page='+page,formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data' },
+}).then(response => {
                     
               this.datas =  response.data.data
             
@@ -355,18 +445,46 @@ supplier_id:this.supplier_id
     },
 
     datajson(){
-		axios({
-  method: 'post',
-  url: '/managers/returnjsonpurchase' ,
-data:{
-  ref:this.ref,
-date:this.date,
-delivery_date:this.delivery_date, 
-project_id:this.project_id,
-user_id:this.user_id,
-supplier_id:this.supplier_id
+
+      let formData = new FormData();
+
+if(this.project_id){
+	 formData.append('project_id', this.project_id);
 }
-})		.then(response => {
+
+
+if(this.to){
+	 formData.append('to', this.to);
+}
+
+
+if(this.from){
+	 formData.append('from', this.from);
+}
+
+
+if(this.supplier_id){
+	 formData.append('supplier_id', this.supplier_id);
+}
+
+if(this.delivery_date){
+	 formData.append('delivery_date', this.delivery_date);
+}
+
+if(this.ref){
+	 formData.append('ref', this.ref);
+}
+
+if(this.user_id){
+	 formData.append('user_id', this.user_id);
+}
+
+axios.post('/managers/returnjsonpurchase',formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data' },
+})
+
+	.then(response => {
                     
               this.datas =  response.data.data
             
@@ -396,6 +514,7 @@ this.payment.splice(index,1)
      this.datajson()
      this.project()
      this.user()
+     this.capital()
      this.supplier()
         },
       
@@ -403,7 +522,10 @@ this.payment.splice(index,1)
           'ref':function(){
             this.datajson()
           } ,
-'date':function(){
+'to':function(){
+            this.datajson()
+          } ,
+          'from':function(){
             this.datajson()
           } ,
 'delivery_date':function(){
@@ -418,6 +540,16 @@ this.payment.splice(index,1)
 'supplier_id':function(){
             this.datajson()
           } 
+        },
+        computed:{
+          rest(){
+            var sum = Number(this.purchase_payment.paid) + Number(this.total) - ( Number(this.purchase_payment.total)   ) ?? 0
+
+            sum = sum.toFixed(2)
+
+            return sum 
+          },
+       
         }
     }
 </script>

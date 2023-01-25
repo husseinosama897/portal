@@ -163,12 +163,7 @@
            </div>
            
                      <div class="row">
-                        <div class="col-xl-4 mb-2">
-                           <div class="form-group">
-                              <label for="password" class="form-label"> to</label>
-                              <input type="text"  @change="updating_data" class="form-control input-default " v-model="to" placeholder="to">
-                           </div>
-                        </div>
+                  
                          <div class="col-xl-4 mb-2">
                            <div class="form-group">
                               <input type="text" class="form-control input-default "
@@ -245,7 +240,7 @@
                            <th><strong>qty</strong></th>
                            <th><strong>unit price</strong></th>
                            <th><strong>total</strong></th>
-                           <th></th>
+                           <th>previous value</th>
                            <th></th>
                         </tr>
                      </thead>
@@ -272,6 +267,7 @@
                            <td>     <input v-model="product.qty" @change="updating_data" class="form-control"></td>
                            <td>     <input v-model="product.unit_price" @change="updating_data" class="form-control"></td>
                            <td>{{ product.total  }}</td>
+                           <td>{{ product.value  }}</td>
                            <td>
                               <a class="btn btn-danger" @click="removeproduct(index)" >
                               <strong style="color:white;">  Delete</strong>
@@ -841,7 +837,9 @@ if(this.discount > 100){
 
 Vue.set(pro,'dis',data.name)
 Vue.set(pro,'id',data.id)
+Vue.set(pro,'value',data.value)
 
+console.log(pro.value)
 
 },
 

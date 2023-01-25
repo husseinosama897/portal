@@ -1,6 +1,6 @@
 <template>
 <div>
-      <div class="card mt-3">
+      <div class="card mt-6">
            
            <div class="card-body">
              <div class="card-header">
@@ -49,7 +49,7 @@
 
                             <td>{{data.comp ? data.comp : data.customer_name}}</td>
                             <td>{{data.tax_number}} </td>
-                            <td>{{data.email}}</td>
+                         
                           <td>
                             {{data.phone}}
                           </td>
@@ -61,7 +61,7 @@
                             <td>
                               <a  @click="editing(data)" href="#editEmployeeModal" class="edit" data-toggle="modal">
               
-               <i class="fas fa-edit plus-fa"></i>
+               <i class="fas fa-edit"></i>
 
               </a>
                               <a   @click="dele(data,index)" href="#deleteEmployeeModal" class="delete" data-toggle="modal">
@@ -69,12 +69,7 @@
                               
                               </a>
                             </td>
-                            <td style="width: 50px;">
-                              <span class="custom-checkbox">
-                                <input type="checkbox"  v-model="deleter" id="checkbox1" name="options[]" :value="data.id">
-                                <label for="checkbox1"></label>
-                              </span>
-                            </td>
+                    
                           </tr>
                         </tbody>
                       </table>

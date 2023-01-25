@@ -33,6 +33,40 @@
                               </select>
                            </div>
                         </div>
+                        <div class="col-xl-4 mb-2">
+                           <div class="form-group">
+                              <label for="password" class="form-label">type </label>
+                                   <select class="form-select select2" v-model="type">
+                              <option  value="1">End of service</option>
+                              
+                              <option  value="2">annual vacation</option>
+<option  value="3"> vacation</option>
+<option  value="4"> transfer request</option>
+                              
+
+                              </select>
+                           </div>
+                        </div>
+                        <div class="col-xl-4 mb-2" >
+                      
+                      <div class="form-group"  >
+                         <label for="password" v-if="loan_option" class="form-label">loan value</label>
+                         <input type="text" v-if="loan_option" class="form-control"  v-model="loan_value" id="exampleCheck1">
+                      
+                 
+                      </div>
+                 
+                   </div>
+                   <div class="col-xl-2 mb-2" >
+                 
+                 <div class="form-group"  >
+                   
+                    <input type="checkbox" class="form-check-input"  v-model="loan_option" id="exampleCheck1">
+                    <label class="form-check-label">loan</label>
+                    
+                 </div>
+            
+              </div>
                      </div>
                      <div class="row">
                         <div class="col-xl-4 mb-2">
@@ -41,7 +75,14 @@
                               <input type="text" class="form-control input-default " v-model="to" placeholder="to">
                            </div>
 
-                           <div class="col-xl-4 mb-2">
+                         
+
+                     
+
+
+                        </div>
+
+                        <div class="col-xl-4 mb-2">
                            <div class="form-group">
                               <label for="password" class="form-label"> role  (If requested not for you) </label>
                                    <select class="form-select select2" @change="getUser" v-model="role_id">
@@ -52,7 +93,8 @@
                         </div>
 
 
-                        <div class="col-xl-4 mb-2" v-if="users.length > 0">
+                 
+                        <div class="col-xl-4 mb-2" v-if="usersz.length > 0">
                            <div class="form-group">
                               <label for="password" class="form-label"> users</label>
                                    <select class="form-select select2"  v-model="user_id">
@@ -61,23 +103,7 @@
                               </select>
                            </div>
                         </div>
-
-
-                        </div>
-
-                 
-                        <div class="col-xl-6 mb-2" >
-                      
-                           <div class="form-group"  >
-                              <label for="password" v-if="loan_option" class="form-label">loan value</label>
-                              <input type="text" v-if="loan_option" class="form-control"  v-model="loan_value" id="exampleCheck1">
-                           
-                              <input type="checkbox" class="form-check-input"  v-model="loan_option" id="exampleCheck1">
-                              <label class="form-check-label">loan</label>
-                              
-                           </div>
-                      
-                        </div>
+                   
 
 
                          <div class="col-xl-4 mb-2">
@@ -200,6 +226,7 @@ role_id:'',
 loan_option:false,
 loan_value:'',
 projects:[],
+type:'',
 subject:'',
 userz:[],
 content:'With reference to the above subject, ',
@@ -221,7 +248,7 @@ subject:'',
 
          
          getUser(){
-            this.users.splice(0)
+            this.usersz.splice(0)
             axios({
   method: 'get',
   url: '/employee_by_role/'+this.role_id ,
@@ -500,7 +527,7 @@ this.payment.splice(index,1)
  },
         mounted() {
            this.project()
-
+this.rolejson()
                  var dataa =  this.$cookies.get('employee');
 
 this.ref = dataa.ref,

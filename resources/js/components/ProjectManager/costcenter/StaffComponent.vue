@@ -251,9 +251,9 @@ computed:{
  if(this.staff ){
  this.staff.forEach(e=>{
   if(e.user){
-    var min = (e.user.attending_and_leaving_sum_min ) / 60
-     var time =(e.user.attending_and_leaving_sum_time_difference  )  + (min)
- time = Math.round(time)
+   
+     var time =(e.user.timesheet_project_personal_sum_time   / 60 ) 
+ time = time.toFixed(2)
 
  var salaryPerDay = (Number(e.salary_per_month ) / Number(this.working_day))
   salaryPerDay = salaryPerDay.toFixed(2)

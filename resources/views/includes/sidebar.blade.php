@@ -77,21 +77,6 @@
                 </a>
             </li>
             
-@if(auth()->user()->role  &&  auth()->user()->role->name == 'Projects Manger')
-            <li class="side-nav-item">
-                <a href="{{ route('user.index_CWS') }}" class="side-nav-link">
-                    <i class="uil uil-file-edit-alt"></i>
-                    <span>subcontractor invoice </span>
-                </a>
-            </li>
-@endif
-
-            <li class="side-nav-item">
-                <a href="{{ route('user.Archives') }}" class="side-nav-link">
-                    <i class="uil uil-file-edit-alt"></i>
-                    <span>Archives </span>
-                </a>
-            </li>
 
 
             
@@ -100,6 +85,89 @@
                                 </ul>
                             </li>
                       
+                            @if( !empty(auth()->user()->projectmanager()) && auth()->user()->projectmanager)
+                            
+                            <li class="slide">
+                                <a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0)"><i class="side-menu__icon fe fe-slack"></i><span class="side-menu__label">project manager</span><i class="angle fe fe-chevron-right"></i></a>
+                                <ul class="slide-menu">
+     
+     
+                                
+            <li class="side-nav-item">
+                <a href="{{ route('user.index_CWS') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>subcontractor invoice </span>
+                </a>
+            </li>
+
+            <li class="side-nav-item">
+                <a href="{{ route('user.Archives') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>Archives </span>
+                </a>
+            </li>
+
+            
+
+                                @if( !empty(auth()->user()->projectmanager()) && auth()->user()->projectmanager)
+            <li class="side-nav-item">
+                <a href="{{ route('daily_report_index.user') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>team leader reports</span>
+                </a>
+            </li>
+            @endif
+
+            
+            @if( !empty(auth()->user()->projectmanager()) && auth()->user()->projectmanager)
+            <li class="side-nav-item">
+                <a href="{{ route('projectManager.dc.index') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>DCC</span>
+                </a>
+            </li>
+            @endif
+
+                     
+            @if( !empty(auth()->user()->projectmanager()) && auth()->user()->projectmanager)
+            <li class="side-nav-item">
+                <a href="{{ route('projectmanager.timesheet') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>project TimeSheet</span>
+                </a>
+            </li>
+
+            
+            @endif
+            <li class="side-nav-item">
+                <a href="{{ route('projectmanager.projectstimesheetPage') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>project summary</span>
+                </a>
+            </li>
+
+
+            <li class="side-nav-item">
+                <a href="{{ route('projectmanager.index_laborer') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>laborer  </span>
+                </a>
+            </li>
+           
+            <li class="side-nav-item">
+                <a href="{{ route('projectmanager.attendance_absence_manule') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>manule attendance </span>
+                </a>
+            </li>
+
+
+        
+            
+                                </ul>
+                            </li>
+            @endif
+
                             
                             @if(auth()->user()->role && auth()->user()->role->name == 'Team Leader' || auth()->user()->role && auth()->user()->role->name == 'Projects Manger')
             <li class="side-nav-item">
@@ -157,6 +225,10 @@
                 </a>
             </li>
 
+     
+
+
+            
 
             
 
@@ -168,64 +240,22 @@
             </li>
         
                   
+
+            <li class="side-nav-item">
+                <a href="{{ route('tender.index') }}" class="side-nav-link">
+              
+                    <span>tender</span>
+                </a>
+            </li>
+
+
+            <li class="side-nav-item">
+                <a href="{{ route('marketing.index.user') }}" class="side-nav-link">
+         
+                    <span>marketing</span>
+                </a>
+            </li>
                       
-                            <li class="slide">
-                                <a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0)"><i class="side-menu__icon fe fe-slack"></i><span class="side-menu__label">project manager</span><i class="angle fe fe-chevron-right"></i></a>
-                                <ul class="slide-menu">
-     
-     
-
-                                @if( !empty(auth()->user()->projectmanager()) && auth()->user()->projectmanager)
-            <li class="side-nav-item">
-                <a href="{{ route('daily_report_index.user') }}" class="side-nav-link">
-                    <i class="uil uil-file-edit-alt"></i>
-                    <span>team leader reports</span>
-                </a>
-            </li>
-            @endif
-
-            
-            @if( !empty(auth()->user()->projectmanager()) && auth()->user()->projectmanager)
-            <li class="side-nav-item">
-                <a href="{{ route('projectManager.dc.index') }}" class="side-nav-link">
-                    <i class="uil uil-file-edit-alt"></i>
-                    <span>DCC</span>
-                </a>
-            </li>
-            @endif
-
-                     
-            @if( !empty(auth()->user()->projectmanager()) && auth()->user()->projectmanager)
-            <li class="side-nav-item">
-                <a href="{{ route('projectmanager.timesheet') }}" class="side-nav-link">
-                    <i class="uil uil-file-edit-alt"></i>
-                    <span>project TimeSheet</span>
-                </a>
-            </li>
-
-            
-            @endif
-            <li class="side-nav-item">
-                <a href="{{ route('projectmanager.projectstimesheetPage') }}" class="side-nav-link">
-                    <i class="uil uil-file-edit-alt"></i>
-                    <span>project summary</span>
-                </a>
-            </li>
-
-            <li class="side-nav-item">
-                <a href="{{ route('projectmanager.attendance_absence_manule') }}" class="side-nav-link">
-                    <i class="uil uil-file-edit-alt"></i>
-                    <span>manule attendance </span>
-                </a>
-            </li>
-
-
-            
-            
-            
-                                </ul>
-                            </li>
-            
             
                         </ul>
                         <div class="slide-right" id="slide-right"><svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24" viewBox="0 0 24 24"><path d="M10.707 17.707 16.414 12l-5.707-5.707-1.414 1.414L13.586 12l-4.293 4.293z"/></svg></div>

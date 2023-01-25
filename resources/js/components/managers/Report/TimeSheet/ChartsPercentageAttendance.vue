@@ -109,11 +109,12 @@ var actual = 0
               this.output = this.output.toFixed(2)
              var exponent = (1 / this.series[0].data.length)
 
-             var st = this.series[0].data[0] / this.series[0].data[this.series[0].data.length - 1]
+             var st = (Number(this.series[0].data[this.series[0].data.length - 1]) / Number(this.series[0].data[0]  > 0 ? this.series[0].data[0] : 0.01  )   )
 
+             console.log(st)
          this.growth_rate =     Math.pow(st,exponent) - 1 
 
-         this.growth_rate =   (this.growth_rate * 100)
+         this.growth_rate =   (this.growth_rate * 100) 
 
          this.growth_rate = this.growth_rate.toFixed(2)
 

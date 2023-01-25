@@ -19,7 +19,7 @@ Add product
                       <table id="basic-datatable" class="table dt-responsive nowrap w-100">
                         <thead>
                           <tr>
- <th scope="col"> code </th>
+
                             <th scope="col">product</th>     
                             <th scope="col">type</th>
               
@@ -57,7 +57,7 @@ Add product
                 
 
                
-          
+                
             </div>
 
 

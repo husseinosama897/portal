@@ -154,7 +154,7 @@
 <div class="col-8" >
     <div class="card">
         <div class="card-body">
-        <chart-project-overall  :data2="data.personal_overall"  ></chart-project-overall>
+        <chart-project-overall  :data2="data.personal_overall"  :user="data"  ></chart-project-overall>
     </div>
 </div>
     </div>

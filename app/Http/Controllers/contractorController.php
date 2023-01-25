@@ -228,9 +228,11 @@ public function getselectboxcontractor(request $request){
 {
 
 
-  $contractor = contractor::find($contractor)->with([
+  $contractor = contractor::where('id',$contractor)->with(
     'file','cws',
-  ])->withsum('cws','total')->first();
+  )->first();
+
+
 
   return view('managers.contractor.profile')->with(['data'=>$contractor]);
 

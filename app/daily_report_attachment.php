@@ -8,4 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class daily_report_attachment extends Model
 {
     use HasFactory;
+
+ 
+     
 }

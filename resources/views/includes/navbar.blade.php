@@ -116,6 +116,16 @@
                                                     
                                                 </a>
                                                 @endif
+
+                                                @if(!empty(Auth::user()) )
+                                                <a class="dropdown-item" href="{{ route('my.profile') }}">
+                                                    <i class="dropdown-icon fe fe-mail"></i> profile
+                                                    
+                                                </a>
+                                                @endif
+
+                                               
+
                                                 <!---
                                                 <a class="dropdown-item" href="lockscreen.html">
                                                     <i class="dropdown-icon fe fe-lock"></i> Lockscreen

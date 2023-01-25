@@ -28,9 +28,13 @@ class petty_cash extends Model
  'ref',
 'to',
    'content',
+   'paid',
 
    ];
 
+   public function paids(){
+      return $this->HasMany(petty_cash_paid::class,'petty_cash_id');
+   }
    
    public function project(){
     return $this->belongsto(project::class,'project_id');

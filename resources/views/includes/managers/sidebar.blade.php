@@ -348,6 +348,34 @@ $Subcontractorz = \App\subcontractor::where('status',0)->count();
                 </a>
             </li>
 
+            <li class="side-nav-item">
+                <a href="{{ route('index.role') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>role </span>
+                </a>
+            </li>
+
+
+            
+            <li class="side-nav-item">
+                <a href="{{ route('section.index') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>section </span>
+                </a>
+            </li>
+
+            <li class="side-nav-item">
+                <a href="{{ route('daily.financial_index') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>daily financial report </span>
+                </a>
+            </li>
+
+            
+
+            
+
+            
 
             
 
@@ -357,6 +385,13 @@ $Subcontractorz = \App\subcontractor::where('status',0)->count();
                 <a href="{{ route('attendance_Manule') }}" class="side-nav-link">
                     <i class="uil uil-file-edit-alt"></i>
                     <span>Manule attendance </span>
+                </a>
+            </li>
+
+            <li class="side-nav-item">
+                <a href="{{ route('attendancetoday') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span> attendance  list </span>
                 </a>
             </li>
 
@@ -382,7 +417,67 @@ $Subcontractorz = \App\subcontractor::where('status',0)->count();
                 </a>
             </li>
 
+            <li class="side-nav-item">
+                <a href="{{ route('positiontimesheetPage') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>salary scale  </span>
+                </a>
+            </li>
 
+
+            
+            
+            <li class="side-nav-item">
+                <a href="{{ route('procurementpage') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>procurement </span>
+                </a>
+
+            </li>
+
+                   
+            <li class="side-nav-item">
+                <a href="{{ route('marketingpage.report') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>marketing </span>
+                </a>
+
+            </li>
+
+                               
+            <li class="side-nav-item">
+                <a href="{{ route('tenderpage.report') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>tender </span>
+                </a>
+
+            </li>
+
+            
+
+
+
+
+            <li class="side-nav-item">
+                <a href="{{ route('construction') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>construction </span>
+                </a>
+
+            </li>
+
+            <li class="side-nav-item">
+                <a href="{{ route('projectstimesheetPage') }}" class="side-nav-link">
+                    <i class="uil uil-file-edit-alt"></i>
+                    <span>project timesheet </span>
+                </a>
+            </li>
+
+            
+
+           
+
+            
 
             <li class="side-nav-item">
                 <a href="{{ route('stockpage') }}" class="side-nav-link">

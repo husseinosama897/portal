@@ -273,6 +273,23 @@ Vue.component('customer-update-component', require('./components/managers/custom
 
 Vue.component('role-create-component', require('./components/managers/role/CreateComponent.vue').default);
 
+Vue.component('role-update-component', require('./components/managers/role/UpdateComponent.vue').default);
+
+Vue.component('role-index-component', require('./components/managers/role/IndexComponent.vue').default);
+
+
+
+// ----------------------------------- * * *  section * * * ------------------------------------------------------
+
+Vue.component('section-create-component', require('./components/managers/section/CreateComponent.vue').default);
+
+Vue.component('section-update-component', require('./components/managers/section/UpdateComponent.vue').default);
+
+Vue.component('section-index-component', require('./components/managers/section/IndexComponent.vue').default);
+
+
+
+
 // ------------------------------ ** contractor ** ------------------------------------------
 Vue.component('contractor-create-component', require('./components/managers/contractor/CreateComponent.vue').default);
 
@@ -401,9 +418,12 @@ Vue.component('add-user', require('./components/AddUser.vue').default);
 Vue.component('profile-component', require('./components/managers/Report/profile/ProfileComponent.vue').default);
 
 
+Vue.component('card-component', require('./components/managers/Report/profile/CardComponent.vue').default);
 
 
 Vue.component('profile-chart-project_overall', require('./components/managers/Report/profile/OverAll.vue').default);
+
+Vue.component('attendance-list', require('./components/managers/Report/attendance/AttendanceList.vue').default);
 
 
 
@@ -491,6 +511,31 @@ Vue.component('chart-project-overall', require('./components/managers/Report/pro
 
 
 Vue.component('chart-out-in', require('./components/managers/Report/project/CashOut_In.vue').default);
+
+
+
+//----------------------------------ConstructionComponent -----------------------------------
+Vue.component('rating-construction', require('./components/managers/Report/section/ConstructionComponent.vue').default);
+
+
+Vue.component('rating-procurement', require('./components/managers/Report/section/procurementComponent.vue').default);
+
+Vue.component('rating-marketing', require('./components/managers/Report/section/MarketingComponent.vue').default);
+
+
+Vue.component('rating-tender', require('./components/managers/Report/section/TenderComponent.vue').default);
+
+
+
+
+Vue.component('create-report-financial', require('./components/managers/Report/daily_report_financial/CreateComponent.vue').default);
+
+Vue.component('daily-report-financial', require('./components/managers/Report/daily_report_financial/ReportComponent.vue').default);
+
+Vue.component('print-daily-financial', require('./components/managers/Report/daily_report_financial/PrintComponent.vue').default);
+
+
+
 
 
 
